@@ -1,0 +1,375 @@
+<!DOCTYPE html><html class="dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="./tailwindcss.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary-fixed": "#e1e0ff", "on-surface-variant": "#c7c4d7", "on-secondary-container": "#00311f", "on-primary": "#1000a9", "error-container": "#93000a", "on-tertiary-container": "#4a1c00", "surface-container-lowest": "#0a0e14", "on-tertiary-fixed": "#341100", "surface-dim": "#10141a", "on-tertiary-fixed-variant": "#783200", "inverse-primary": "#494bd6", "outline": "#908fa0", "tertiary-container": "#ec6a06", "surface-container": "#1c2026", "background": "#10141a", "surface-bright": "#353940", "secondary-fixed": "#6ffbbe", "surface-container-highest": "#31353c", "secondary-container": "#00a572", "surface-container-low": "#181c22", "tertiary": "#ffb690", "on-error-container": "#ffdad6", "on-background": "#dfe2eb", "surface-variant": "#31353c", "secondary-fixed-dim": "#4edea3", "on-secondary": "#003824", "on-error": "#690005", "on-primary-fixed-variant": "#2f2ebe", "on-surface": "#dfe2eb", "primary-fixed-dim": "#c0c1ff", "secondary": "#4edea3", "outline-variant": "#464554", "on-tertiary": "#552100", "inverse-surface": "#dfe2eb", "on-secondary-fixed": "#002113", "primary-container": "#8083ff", "surface-tint": "#c0c1ff", "surface-container-high": "#262a31", "on-secondary-fixed-variant": "#005236", "primary": "#c0c1ff", "on-primary-container": "#0d0096", "error": "#ffb4ab", "on-primary-fixed": "#07006c", "inverse-on-surface": "#2d3137", "tertiary-fixed": "#ffdbca", "tertiary-fixed-dim": "#ffb690", "surface": "#10141a" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter-mobile": "0.75rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "gutter": "1rem", "space-xl": "2rem", "space-sm": "0.5rem", "space-md": "1rem", "margin-mobile": "1rem", "margin": "1.5rem" }, fontFamily: { "body-sm": ["Inter"], "label-lg": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "label-sm": ["Space Grotesk"], "display-hero": ["Space Grotesk"], "label-md": ["Space Grotesk"], "display-hero-mobile": ["Space Grotesk"], "headline-lg": ["Space Grotesk"], "body-lg": ["Inter"], "body-md": ["Inter"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "18px", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "12px", "fontWeight": "600" }], "display-hero": ["40px", { "lineHeight": "48px", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "display-hero-mobile": ["30px", { "lineHeight": "36px", "fontWeight": "700" }], "headline-lg": ["26px", { "lineHeight": "32px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }] } } } };</script><style>@layer base { html, body { width: 100vw; margin: 0; padding: 0; min-height: 100vh; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#10141a"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="PackDay"><link rel="apple-touch-icon" href="./icons/packday.svg"><title>PackDay ? Checklist</title><link rel="icon" type="image/svg+xml" href="./icons/packday.svg"></head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.12)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-secondary shadow-[0_0_12px_rgba(78,222,163,0.25)]"><span class="material-symbols-outlined text-[20px]">backpack</span></div><div class="flex flex-col"><span class="font-label-lg text-label-lg tracking-tight text-on-surface leading-none">PackDay</span><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">Checklist</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-xl active:scale-95 transition-all"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full pb-8">
+<!-- Horizontal Date / Calendar Strip (Image 4 Style) -->
+<section class="px-margin-mobile pt-space-xs pb-space-sm">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">September 2025</span>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+<span class="">Week 4</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-space-xs overflow-x-auto py-space-xs no-scrollbar">
+<!-- Mon 14 -->
+<button class="flex flex-col items-center justify-center min-w-[44px] py-space-xs px-1 rounded-xl bg-surface-container text-on-surface-variant transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase">Mon</span>
+<span class="font-headline-sm text-headline-sm mt-0.5">14</span>
+</button>
+<!-- Tue 15 (Active Day Highlight - Image 4 purple pop) -->
+<button class="flex flex-col items-center justify-center min-w-[46px] py-space-xs px-1.5 rounded-xl bg-primary-container text-on-primary-container shadow-md shadow-primary-container/30 transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Tue</span>
+<span class="font-headline-md text-headline-md mt-0.5">15</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mt-0.5"></span>
+</button>
+<!-- Wed 16 (Tomorrow Focus) -->
+<button class="flex flex-col items-center justify-center min-w-[44px] py-space-xs px-1 rounded-xl bg-surface-container-high text-primary transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase">Wed</span>
+<span class="font-headline-sm text-headline-sm mt-0.5">16</span>
+</button>
+<!-- Thu 17 -->
+<button class="flex flex-col items-center justify-center min-w-[44px] py-space-xs px-1 rounded-xl bg-surface-container text-on-surface-variant transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase">Thu</span>
+<span class="font-headline-sm text-headline-sm mt-0.5">17</span>
+</button>
+<!-- Fri 18 -->
+<button class="flex flex-col items-center justify-center min-w-[44px] py-space-xs px-1 rounded-xl bg-surface-container text-on-surface-variant transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase">Fri</span>
+<span class="font-headline-sm text-headline-sm mt-0.5">18</span>
+</button>
+<!-- Sat 19 -->
+<button class="flex flex-col items-center justify-center min-w-[44px] py-space-xs px-1 rounded-xl bg-surface-container text-on-surface-variant opacity-60 transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase">Sat</span>
+<span class="font-headline-sm text-headline-sm mt-0.5">19</span>
+</button>
+<!-- Sun 20 -->
+<button class="flex flex-col items-center justify-center min-w-[44px] py-space-xs px-1 rounded-xl bg-surface-container text-on-surface-variant opacity-60 transition-transform active:scale-95" type="button">
+<span class="font-label-sm text-label-sm uppercase">Sun</span>
+<span class="font-headline-sm text-headline-sm mt-0.5">20</span>
+</button>
+</div>
+</section>
+<!-- Mascot Floating Tip Banner (Playful Space/Student Vibe from Image 4) -->
+<section class="px-margin-mobile mb-space-md">
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-container via-inverse-primary to-surface-container-high p-space-md shadow-lg text-on-primary">
+<div class="relative z-10 flex items-center justify-between gap-space-sm">
+<div class="flex-1 pr-2">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="material-symbols-outlined text-[18px] text-tertiary">star</span>
+<span class="font-label-md text-label-md tracking-wider uppercase opacity-90">Ready for Tomorrow?</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm leading-snug">Prep for tomorrow's 4 classes before 9:30 PM</h2>
+<p class="font-body-sm text-body-sm opacity-90 mt-1">2 of 5 required class items packed.</p>
+</div>
+<div class="w-16 h-16 rounded-2xl bg-surface/20 backdrop-blur-md flex items-center justify-center text-primary-fixed shadow-inner shrink-0">
+<span class="material-symbols-outlined text-[34px]">rocket_launch</span>
+</div>
+</div>
+<!-- Background Ambient Glow Ring -->
+<div class="absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-secondary/20 blur-xl pointer-events-none"></div>
+</div>
+</section>
+<!-- Quick Category Filter Pills (Tactile 3D Badges inspired by Image 3) -->
+<section class="px-margin-mobile mb-space-md">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-lg text-label-lg text-on-surface">Category Filters</span>
+<span class="font-label-sm text-label-sm text-secondary">5 Items Total</span>
+</div>
+<div class="grid grid-cols-4 gap-gutter-mobile" id="categoryFilters">
+<!-- All Filter -->
+<button class="filter-btn active flex flex-col items-center justify-center p-space-xs py-space-sm rounded-2xl bg-primary text-on-primary shadow-[0_4px_14px_rgba(192,193,255,0.25)] transition-all" data-filter="all" type="button">
+<div class="w-8 h-8 rounded-xl bg-on-primary/10 flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-[20px]">apps</span>
+</div>
+<span class="font-label-md text-label-md leading-none">All</span>
+<span class="font-label-sm text-label-sm opacity-80 mt-1">(5)</span>
+</button>
+<!-- Tech Filter -->
+<button class="filter-btn flex flex-col items-center justify-center p-space-xs py-space-sm rounded-2xl bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" data-filter="tech" type="button">
+<div class="w-8 h-8 rounded-xl bg-secondary-container/30 text-secondary flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-[20px]">devices</span>
+</div>
+<span class="font-label-md text-label-md leading-none">Tech</span>
+<span class="font-label-sm text-label-sm opacity-70 mt-1">(2)</span>
+</button>
+<!-- Academic Filter -->
+<button class="filter-btn flex flex-col items-center justify-center p-space-xs py-space-sm rounded-2xl bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" data-filter="academic" type="button">
+<div class="w-8 h-8 rounded-xl bg-primary-container/20 text-primary-fixed-dim flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+</div>
+<span class="font-label-md text-label-md leading-none">Academia</span>
+<span class="font-label-sm text-label-sm opacity-70 mt-1">(1)</span>
+</button>
+<!-- Personal Filter -->
+<button class="filter-btn flex flex-col items-center justify-center p-space-xs py-space-sm rounded-2xl bg-surface-container text-on-surface-variant hover:text-on-surface transition-all" data-filter="personal" type="button">
+<div class="w-8 h-8 rounded-xl bg-tertiary-container/30 text-tertiary flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</div>
+<span class="font-label-md text-label-md leading-none">Personal</span>
+<span class="font-label-sm text-label-sm opacity-70 mt-1">(2)</span>
+</button>
+</div>
+</section>
+<!-- Pack Checklist Deck (Combining Light/Surface card aesthetic with Tactile Checkbox Toggles) -->
+<section class="px-margin-mobile flex flex-col gap-space-sm mb-space-lg" id="checklistContainer">
+<!-- Item 1: Casio fx-991ES Calculator -->
+<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-category="academic">
+<div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
+<div class="w-10 h-10 rounded-xl bg-surface-container-highest text-tertiary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">calculate</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap mb-0.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Casio fx-991ES Calculator</h3>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-error font-label-sm text-label-sm">High Priority</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">IT03 Midterm Quiz • Room 408</p>
+<div class="flex items-center gap-space-xs mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-tertiary">alarm</span>
+<span class="">Test starts at 08:30 AM</span>
+</div>
+</div>
+</div>
+<button aria-label="Toggle Casio fx-991ES Calculator" class="checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-highest text-on-surface-variant transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">radio_button_unchecked</span>
+</button>
+</article>
+<!-- Item 2: Google Pixel 8 Test Device (Pre-checked) -->
+<article class="checklist-item checked flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low transition-all shadow-sm opacity-90" data-category="tech">
+<div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">smartphone</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap mb-0.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-through truncate opacity-80">Google Pixel 8 Test Device</h3>
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">Hardware</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">MOBPROG Lab • Android 14 Debugging</p>
+<div class="flex items-center gap-space-xs mt-1 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span class="">Inside front backpack sleeve</span>
+</div>
+</div>
+</div>
+<button aria-label="Toggle Google Pixel 8 Test Device" class="checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-primary-container text-on-primary-container transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">check_box</span>
+</button>
+</article>
+<!-- Item 3: Laptop GaN 65W Charger -->
+<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-category="tech">
+<div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
+<div class="w-10 h-10 rounded-xl bg-surface-container-highest text-tertiary-fixed-dim flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">electrical_services</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap mb-0.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Laptop GaN 65W Charger</h3>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/30 text-tertiary font-label-sm text-label-sm">Night Charge</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Plugged in wall desk</p>
+<div class="flex items-center gap-space-xs mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-tertiary">battery_charging_full</span>
+<span class="">Device at 94%</span>
+</div>
+</div>
+</div>
+<button aria-label="Toggle Laptop GaN 65W Charger" class="checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-highest text-on-surface-variant transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">radio_button_unchecked</span>
+</button>
+</article>
+<!-- Item 4: Folding Compact Umbrella -->
+<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-category="personal">
+<div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
+<div class="w-10 h-10 rounded-xl bg-surface-container-highest text-secondary-fixed-dim flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">umbrella</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap mb-0.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Folding Compact Umbrella</h3>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary font-label-sm text-label-sm">Weather Alert</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Rain forecast at 3:00 PM (80%)</p>
+<div class="flex items-center gap-space-xs mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-secondary">cloud</span>
+<span class="">Afternoon precipitation</span>
+</div>
+</div>
+</div>
+<button aria-label="Toggle Folding Compact Umbrella" class="checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-highest text-on-surface-variant transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">radio_button_unchecked</span>
+</button>
+</article>
+<!-- Item 5: APC RFID Campus ID & Keycard (Pre-checked) -->
+<article class="checklist-item checked flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low transition-all shadow-sm opacity-90" data-category="personal">
+<div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
+<div class="w-10 h-10 rounded-xl bg-primary-container/20 text-primary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap mb-0.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-through truncate opacity-80">APC RFID Campus ID &amp; Keycard</h3>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface font-label-sm text-label-sm">Campus Gate</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Carabiner keychain</p>
+<div class="flex items-center gap-space-xs mt-1 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span class="">Clipped to bag strap</span>
+</div>
+</div>
+</div>
+<button aria-label="Toggle APC RFID Campus ID" class="checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-primary-container text-on-primary-container transition-all active:scale-90" type="button">
+<span class="material-symbols-outlined text-[24px]">check_box</span>
+</button>
+</article>
+</section>
+<!-- Interactive Quick Add Bar & Sticky Mark All Action -->
+<section class="px-margin-mobile flex flex-col gap-space-sm">
+<!-- Quick Add Input Pill -->
+<div class="flex items-center gap-space-xs bg-surface-container-high rounded-2xl p-1.5 pl-space-md shadow-inner">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">add_task</span>
+<input class="bg-transparent flex-1 text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md focus:outline-none min-w-0" id="quickAddInput" placeholder="Add school item (e.g. Lab Safety Goggles)..." type="text">
+<button class="min-w-[44px] min-h-[44px] rounded-xl bg-surface-container-highest text-on-surface hover:text-primary flex items-center justify-center transition-transform active:scale-95" id="quickAddBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">arrow_upward</span>
+</button>
+</div>
+<!-- Mark All as Packed Sticky/Elevated Action Button -->
+<button class="w-full min-h-[48px] py-space-sm px-space-lg rounded-full bg-on-surface text-surface flex items-center justify-center gap-space-xs shadow-lg shadow-on-surface/10 transition-transform active:scale-95" id="markAllBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">done_all</span>
+<span class="font-label-lg text-label-lg">Mark All as Packed</span>
+</button>
+</section>
+</div>
+<script>
+  (function initChecklistInteractions() {
+    const checklistContainer = document.getElementById('checklistContainer');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const markAllBtn = document.getElementById('markAllBtn');
+    const quickAddInput = document.getElementById('quickAddInput');
+    const quickAddBtn = document.getElementById('quickAddBtn');
+
+    // Toggle individual checkbox
+    function attachItemListeners(card) {
+      const btn = card.querySelector('.checkbox-btn');
+      const title = card.querySelector('h3');
+      const icon = btn.querySelector('.material-symbols-outlined');
+
+      btn.addEventListener('click', () => {
+        const isChecked = card.classList.toggle('checked');
+        btn.setAttribute('aria-pressed', String(isChecked));
+        if (isChecked) {
+          btn.className = 'checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-primary-container text-on-primary-container transition-all active:scale-90';
+          icon.textContent = 'check_box';
+          title.classList.add('line-through', 'opacity-80');
+          card.classList.replace('bg-surface-container-high', 'bg-surface-container-low');
+        } else {
+          btn.className = 'checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-highest text-on-surface-variant transition-all active:scale-90';
+          icon.textContent = 'radio_button_unchecked';
+          title.classList.remove('line-through', 'opacity-80');
+          card.classList.replace('bg-surface-container-low', 'bg-surface-container-high');
+        }
+      });
+    }
+
+    document.querySelectorAll('.checklist-item').forEach(attachItemListeners);
+
+    // Filter Badges logic
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.className = 'filter-btn flex flex-col items-center justify-center p-space-xs py-space-sm rounded-2xl bg-surface-container text-on-surface-variant hover:text-on-surface transition-all';
+        });
+        btn.className = 'filter-btn active flex flex-col items-center justify-center p-space-xs py-space-sm rounded-2xl bg-primary text-on-primary shadow-[0_4px_14px_rgba(192,193,255,0.25)] transition-all';
+
+        const filter = btn.getAttribute('data-filter');
+        const items = checklistContainer.querySelectorAll('.checklist-item');
+        items.forEach(item => {
+          if (filter === 'all' || item.getAttribute('data-category') === filter) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Mark All as Packed
+    if (markAllBtn) {
+      markAllBtn.addEventListener('click', () => {
+        const items = checklistContainer.querySelectorAll('.checklist-item');
+        items.forEach(card => {
+          if (!card.classList.contains('checked')) {
+            card.classList.add('checked');
+            const btn = card.querySelector('.checkbox-btn');
+            const title = card.querySelector('h3');
+            const icon = btn.querySelector('.material-symbols-outlined');
+            btn.setAttribute('aria-pressed', 'true');
+            btn.className = 'checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-primary-container text-on-primary-container transition-all active:scale-90';
+            icon.textContent = 'check_box';
+            title.classList.add('line-through', 'opacity-80');
+            card.classList.replace('bg-surface-container-high', 'bg-surface-container-low');
+          }
+        });
+      });
+    }
+
+    // Quick Add Gear item
+    function addNewItem() {
+      const val = quickAddInput.value.trim();
+      if (!val) return;
+
+      const newCard = document.createElement('article');
+      newCard.setAttribute('data-category', 'academic');
+      newCard.setAttribute('data-custom', 'true');
+      newCard.className = 'checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm';
+      const content = document.createElement('div');
+      content.className = 'flex items-start gap-space-sm min-w-0 pr-space-xs';
+      const iconBox = document.createElement('div');
+      iconBox.className = 'w-10 h-10 rounded-xl bg-surface-container-highest text-primary flex items-center justify-center shrink-0 mt-0.5';
+      const backpackIcon = document.createElement('span');
+      backpackIcon.className = 'material-symbols-outlined text-[22px]';
+      backpackIcon.textContent = 'backpack';
+      iconBox.appendChild(backpackIcon);
+
+      const details = document.createElement('div');
+      details.className = 'flex flex-col min-w-0';
+      const heading = document.createElement('div');
+      heading.className = 'flex items-center gap-space-xs flex-wrap mb-0.5';
+      const title = document.createElement('h3');
+      title.className = 'font-headline-sm text-headline-sm text-on-surface truncate';
+      title.textContent = val;
+      const badge = document.createElement('span');
+      badge.className = 'px-2 py-0.5 rounded-full bg-primary-container/30 text-primary-fixed-dim font-label-sm text-label-sm';
+      badge.textContent = 'Custom';
+      heading.append(title, badge);
+      const description = document.createElement('p');
+      description.className = 'font-body-sm text-body-sm text-on-surface-variant truncate';
+      description.textContent = 'Added for tomorrow';
+      details.append(heading, description);
+      content.append(iconBox, details);
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.setAttribute('aria-label', `Toggle ${val}`);
+      toggle.setAttribute('aria-pressed', 'false');
+      toggle.className = 'checkbox-btn min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-surface-container-highest text-on-surface-variant transition-all active:scale-90';
+      const checkboxIcon = document.createElement('span');
+      checkboxIcon.className = 'material-symbols-outlined text-[24px]';
+      checkboxIcon.textContent = 'radio_button_unchecked';
+      toggle.appendChild(checkboxIcon);
+      newCard.append(content, toggle);
+
+      checklistContainer.insertBefore(newCard, checklistContainer.firstChild);
+      attachItemListeners(newCard);
+      quickAddInput.value = '';
+    }
+
+    if (quickAddBtn && quickAddInput) {
+      quickAddBtn.addEventListener('click', addNewItem);
+      quickAddInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addNewItem();
+      });
+    }
+  })();
+</script></main><div class="fixed bottom-0 w-full z-50 pointer-events-none pb-safe"><div class="px-margin-mobile pb-space-sm flex justify-center"><nav class="pointer-events-auto w-full max-w-md bg-surface-container-low/90 backdrop-blur-xl rounded-full shadow-[0_12px_32px_rgba(0,0,0,0.55)] px-space-xs py-space-xs flex items-center justify-between" data-active-classes="text-primary font-label-md"><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-sm text-label-sm mt-0.5">Dashboard</span></a><a aria-current="page" class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 transition-colors text-primary font-label-md" data-path="checklist" href="#"><span class="material-symbols-outlined text-[20px]">checklist</span><span class="font-label-sm text-label-sm mt-0.5">Checklist</span></a><div class="flex items-center justify-center px-space-xs"><a aria-label="Quick Add Item" class="w-11 h-11 rounded-full bg-on-surface text-surface flex items-center justify-center shadow-[0_4px_16px_rgba(255,255,255,0.2)] active:scale-95 transition-transform" data-path="add-gear-item" href="#"><span class="material-symbols-outlined text-[22px]">add</span></a></div><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="schedule" href="#"><span class="material-symbols-outlined text-[20px]">calendar_today</span><span class="font-label-sm text-label-sm mt-0.5">Schedule</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="gear-radar" href="#"><span class="material-symbols-outlined text-[20px]">explore</span><span class="font-label-sm text-label-sm mt-0.5">Item Finder</span></a></nav></div></div>
+
+<script src="./app.js" defer></script></body></html>

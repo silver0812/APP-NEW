@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "PackDay",
+  "short_name": "PackDay",
+  "description": "Plan your classes and keep your campus essentials ready.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#10141a",
+  "theme_color": "#10141a",
+  "icons": [
+    {
+      "src": "./icons/packday.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
