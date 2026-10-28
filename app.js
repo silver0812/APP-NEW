@@ -18,6 +18,7 @@
     schedule: 'packday.schedule.v1',
     profile: 'packday.profile.v1',
     events: 'packday.events.v1',
+    reminder: 'packday.reminder.v1',
     freshStart: 'packday.fresh-start.v2'
   };
   const defaultProfilePhoto = './icons/profile-placeholder.svg';
@@ -72,6 +73,158 @@
     notice.hidden = false;
     clearTimeout(noticeTimer);
     noticeTimer = setTimeout(() => { notice.hidden = true; }, 2600);
+  }
+
+  function loadReminder() {
+    const saved = readStorage(storageKeys.reminder, {});
+    return {
+      enabled: saved?.enabled === true,
+      time: typeof saved?.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(saved.time)
+        ? saved.time
+        : '20:30',
+      lastFiredDate: typeof saved?.lastFiredDate === 'string' ? saved.lastFiredDate : ''
+    };
+  }
+
+  let nightPrepReminder = loadReminder();
+
+  function formatReminderTime(value) {
+    const [hour, minute] = value.split(':').map(Number);
+    return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' })
+      .format(new Date(2000, 0, 1, hour, minute));
+  }
+
+  async function notifyNightPrepReminder() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      throw new Error('Notification permission is not enabled.');
+    }
+
+    const options = {
+      body: 'Take a moment to check your backpack and get ready for tomorrow.',
+      icon: './icons/packday.svg',
+      badge: './icons/packday.svg',
+      tag: 'packday-night-prep',
+      requireInteraction: true,
+      vibrate: [250, 120, 250],
+      data: { url: './profile.html#night-prep-reminder' }
+    };
+    const registration = 'serviceWorker' in navigator
+      ? await navigator.serviceWorker.getRegistration()
+      : null;
+    if (registration?.showNotification) {
+      await registration.showNotification('PackDay night prep reminder', options);
+      return;
+    }
+    new Notification('PackDay night prep reminder', options);
+  }
+
+  function checkNightPrepReminder() {
+    nightPrepReminder = loadReminder();
+    if (!nightPrepReminder.enabled) return;
+    const notificationsAvailable = 'Notification' in window;
+    if (!notificationsAvailable || Notification.permission !== 'granted') {
+      nightPrepReminder.enabled = false;
+      writeStorage(storageKeys.reminder, nightPrepReminder);
+      const toggle = document.getElementById('nightPrepReminderEnabled');
+      const status = document.getElementById('nightPrepReminderStatus');
+      if (toggle) toggle.checked = false;
+      if (status) {
+        status.textContent = notificationsAvailable
+          ? 'Notifications are blocked. Allow them for PackDay in your browser settings.'
+          : 'Notifications are not available in this browser. Use PackDay in Chrome or Safari.';
+      }
+      return;
+    }
+    const now = new Date();
+    const today = dateKey(now);
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (time !== nightPrepReminder.time || nightPrepReminder.lastFiredDate === today) return;
+
+    nightPrepReminder.lastFiredDate = today;
+    if (!writeStorage(storageKeys.reminder, nightPrepReminder)) return;
+    notifyNightPrepReminder().catch((error) => {
+      console.error('PackDay could not show the night prep reminder.', error);
+      nightPrepReminder.lastFiredDate = '';
+      writeStorage(storageKeys.reminder, nightPrepReminder);
+      showNotice('The reminder could not be shown. Check notification permission in your browser settings.');
+    });
+  }
+
+  function connectNightPrepReminder() {
+    const toggle = document.getElementById('nightPrepReminderEnabled');
+    const timeInput = document.getElementById('nightPrepReminderTime');
+    const status = document.getElementById('nightPrepReminderStatus');
+    if (!toggle || !timeInput) return;
+
+    const updateStatus = () => {
+      if (!status) return;
+      if (!('Notification' in window)) {
+        status.textContent = 'Notifications are not available in this browser. Use PackDay in Chrome or Safari.';
+      } else if (nightPrepReminder.enabled && Notification.permission === 'granted') {
+        status.textContent = `Daily reminder set for ${formatReminderTime(nightPrepReminder.time)}. Keep PackDay open for the alarm.`;
+      } else if (Notification.permission === 'denied') {
+        status.textContent = 'Notifications are blocked. Allow them for PackDay in your browser settings.';
+      } else {
+        status.textContent = 'Choose a time and allow notifications to turn on this daily reminder.';
+      }
+    };
+    const saveReminder = () => writeStorage(storageKeys.reminder, nightPrepReminder);
+
+    timeInput.value = nightPrepReminder.time;
+    toggle.checked = nightPrepReminder.enabled;
+    timeInput.addEventListener('change', () => {
+      if (!timeInput.value) {
+        timeInput.value = nightPrepReminder.time;
+        showNotice('Choose a time for the night prep reminder.');
+        return;
+      }
+      nightPrepReminder.time = timeInput.value;
+      nightPrepReminder.lastFiredDate = '';
+      saveReminder();
+      updateStatus();
+    });
+    toggle.addEventListener('change', async () => {
+      if (!toggle.checked) {
+        nightPrepReminder.enabled = false;
+        saveReminder();
+        updateStatus();
+        return;
+      }
+      if (!('Notification' in window)) {
+        toggle.checked = false;
+        updateStatus();
+        showNotice('This browser does not support reminders. Try the PackDay website in Chrome or Safari.');
+        return;
+      }
+      try {
+        const permission = Notification.permission === 'default'
+          ? await Notification.requestPermission()
+          : Notification.permission;
+        if (permission !== 'granted') {
+          toggle.checked = false;
+          updateStatus();
+          showNotice('Allow notifications in your browser settings to activate the reminder.');
+          return;
+        }
+        nightPrepReminder.enabled = true;
+        nightPrepReminder.lastFiredDate = '';
+        if (!saveReminder()) {
+          toggle.checked = false;
+          nightPrepReminder.enabled = false;
+          return;
+        }
+        updateStatus();
+        showNotice(`Night prep reminder set for ${formatReminderTime(nightPrepReminder.time)}.`);
+        checkNightPrepReminder();
+      } catch (error) {
+        console.error('PackDay could not enable night prep reminders.', error);
+        toggle.checked = false;
+        nightPrepReminder.enabled = false;
+        updateStatus();
+        showNotice('The reminder could not be enabled. Check notification permissions and try again.');
+      }
+    });
+    updateStatus();
   }
 
   function targetForPath(path) {
@@ -379,7 +532,9 @@
 
   function connectNotices() {
     document.querySelectorAll('button[aria-label*="Notifications"]').forEach((button) => {
-      button.addEventListener('click', () => showNotice('You’re all caught up.'));
+      button.addEventListener('click', () => {
+        location.href = 'profile.html#night-prep-reminder';
+      });
     });
     document.querySelectorAll('a[href="#"]:not([data-path])').forEach((link) => {
       link.addEventListener('click', (event) => {
@@ -395,6 +550,14 @@
       button.addEventListener('click', () => {
         const label = button.textContent.trim().replace(/\s+/g, ' ');
         if (label) showNotice(`${label} selected.`);
+      });
+    });
+  }
+
+  function connectReminderShortcuts() {
+    document.querySelectorAll('[data-open-reminder-settings]').forEach((button) => {
+      button.addEventListener('click', () => {
+        location.href = 'profile.html#night-prep-reminder';
       });
     });
   }
@@ -820,6 +983,7 @@
         hour: 'numeric', minute: '2-digit', second: '2-digit'
       }).format(now);
     }
+
     if (timeZone) timeZone.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
     if (dateLabel) {
       dateLabel.textContent = new Intl.DateTimeFormat(undefined, {
@@ -838,6 +1002,13 @@
       }
       renderCalendar();
     }
+  }
+
+  function updateCurrentCalendarYear() {
+    const year = String(new Date().getFullYear());
+    document.querySelectorAll('[data-current-calendar-year]').forEach((element) => {
+      element.textContent = year;
+    });
   }
 
   function connectCalendar() {
@@ -1044,10 +1215,17 @@
   connectDashboardCategories();
   connectNotices();
   connectProfile();
+  connectNightPrepReminder();
+  connectReminderShortcuts();
   connectCalendar();
+  updateCurrentCalendarYear();
   initializeAuth();
   connectInstallPrompt();
   registerServiceWorker();
+  checkNightPrepReminder();
+  window.setInterval(checkNightPrepReminder, 15000);
+  window.setInterval(updateCurrentCalendarYear, 60000);
+  document.addEventListener('visibilitychange', checkNightPrepReminder);
 
   if (new URLSearchParams(location.search).has('add')) {
     document.getElementById('quickAddInput')?.focus();

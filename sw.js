@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'packday-shell-v4';
+const CACHE_NAME = 'packday-shell-v5';
 const APP_FILES = [
   './',
   './index.html',
@@ -33,6 +33,20 @@ self.addEventListener('activate', (event) => {
         .filter((key) => key.startsWith('packday-') && key !== CACHE_NAME)
         .map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = new URL(event.notification.data?.url || './profile.html#night-prep-reminder', self.registration.scope);
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((client) => new URL(client.url).origin === url.origin);
+      if (existing) {
+        return existing.navigate(url.href).then((client) => client?.focus());
+      }
+      return self.clients.openWindow(url.href);
+    })
   );
 });
 

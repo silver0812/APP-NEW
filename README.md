@@ -6,7 +6,13 @@
 
 PackDay is an installable Progressive Web App (PWA). On Android, open the site in Chrome and choose **Install app** or **Add to Home screen**. On iPhone/iPad, open it in Safari, tap **Share**, then **Add to Home Screen**. Checklist items, profile edits, and events you add are saved on your device. On the first visit after the fresh-start update, PackDay clears the previous sample inputs once; later changes are kept.
 
-The calendar uses your device's local date, time, and time zone. You can add device-local events or connect Google Calendar for read-only syncing.
+The calendar uses your device's local date, year, time, and time zone. You can add device-local events or connect Google Calendar for read-only syncing.
+
+## Night prep notification
+
+Open **Profile → Night-Before Pack Prep**, choose a daily time, and enable the reminder. Allow notifications when your browser asks. PackDay then displays an operating-system notification at that time, using the device's notification sound and vibration settings.
+
+The website checks the reminder while PackDay is open. Browsers and mobile operating systems may pause web pages in the background, and a web-only app cannot guarantee an alarm after it has been fully closed. For dependable alarms while closed, a native Android/iOS alarm implementation or a configured push-notification service is required. On iPhone/iPad, notification support also depends on the installed home-screen app and iOS version.
 
 ## Google sign-in and calendar setup
 
