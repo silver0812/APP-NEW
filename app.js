@@ -22,6 +22,29 @@
     freshStart: 'packday.fresh-start.v2'
   };
   const defaultProfilePhoto = './icons/profile-placeholder.svg';
+  const classSchedule = [
+    { code: 'PEDUTRI', section: 'CS251/IT253', units: 2, instructor: 'Algar, Roselyn Novilla', room: '1001', days: [5], start: '07:30', end: '09:30' },
+    { code: 'WEBPROG', section: 'CS251/IT253', units: 3, instructor: 'Quesada, Jose Eugenio Leonor', room: '318', days: [2, 5], start: '11:30', end: '13:30' },
+    { code: 'MOBPROG', section: 'IT253/AFD261', units: 3, instructor: 'Bueno, Carl Dominique Parada', room: '206', days: [2, 5], start: '15:30', end: '17:30' },
+    { code: 'DATAMA2', section: 'IT251', units: 3, instructor: 'Vila, Rachelle Claudine U', room: '318', days: [1, 4], start: '09:30', end: '11:30' },
+    { code: 'PEMBEDS', section: 'IT253', units: 3, instructor: 'Limpin, Alvin Cortez', room: '506', days: [2, 5], start: '13:30', end: '15:30' },
+    { code: 'CLDCOMP', section: 'IT251', units: 3, instructor: 'Gumogda, Gonzalo Valero', room: '316', days: [1, 4], start: '13:30', end: '15:30' },
+    { code: 'COMSEC1', section: 'CSIT01', units: 3, instructor: 'Gumogda, Gonzalo Valero', room: '502', days: [1, 4], start: '15:30', end: '17:30' }
+  ];
+
+  function classesForDate(date) {
+    return classSchedule
+      .filter((course) => course.days.includes(date.getDay()))
+      .map((course) => ({
+        ...course,
+        id: `${course.code}-${dateKey(date)}`,
+        title: course.code,
+        date: dateKey(date),
+        location: `Room ${course.room}`,
+        source: 'class'
+      }))
+      .sort((left, right) => left.start.localeCompare(right.start));
+  }
 
   function readStorage(key, fallback) {
     try {
@@ -299,6 +322,7 @@
 
   function makeCustomChecklistCard(item) {
     const card = document.createElement('article');
+    card.dataset.itemId = item.id || `custom-${window.crypto?.randomUUID ? window.crypto.randomUUID() : Date.now()}`;
     card.dataset.category = item.category || 'academic';
     card.dataset.custom = 'true';
     card.className = 'checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm';
@@ -319,14 +343,29 @@
     const title = document.createElement('h3');
     title.className = 'font-headline-sm text-headline-sm text-on-surface truncate';
     title.textContent = item.name;
+    title.dataset.itemTitle = '';
     const badge = document.createElement('span');
     badge.className = 'px-2 py-0.5 rounded-full bg-primary-container/30 text-primary-fixed-dim font-label-sm text-label-sm';
-    badge.textContent = 'Custom';
+    badge.dataset.itemBadge = '';
+    badge.textContent = item.badge || 'Custom';
     headingRow.append(title, badge);
     const description = document.createElement('p');
     description.className = 'font-body-sm text-body-sm text-on-surface-variant truncate';
-    description.textContent = 'Added for tomorrow';
+    description.dataset.itemDescription = '';
+    description.textContent = item.description || 'Added for tomorrow';
     details.append(headingRow, description);
+    if (item.note) {
+      const note = document.createElement('div');
+      note.className = 'flex items-center gap-space-xs mt-1 text-on-surface-variant font-label-sm text-label-sm';
+      const noteIcon = document.createElement('span');
+      noteIcon.className = 'material-symbols-outlined text-[14px] text-tertiary';
+      noteIcon.textContent = item.noteIcon || 'notifications';
+      const noteText = document.createElement('span');
+      noteText.dataset.itemNote = '';
+      noteText.textContent = item.note;
+      note.append(noteIcon, noteText);
+      details.appendChild(note);
+    }
     content.append(iconBox, details);
 
     const toggle = document.createElement('button');
@@ -349,13 +388,64 @@
   function saveChecklist() {
     const container = document.getElementById('checklistContainer');
     if (!container) return;
-    const items = [...container.querySelectorAll('.checklist-item')].map((card) => ({
-      name: card.querySelector('h3')?.textContent.trim() || '',
-      category: card.dataset.category || 'academic',
-      checked: card.classList.contains('checked'),
-      custom: card.dataset.custom === 'true'
-    }));
+    const items = [...container.querySelectorAll('.checklist-item')].map((card) => {
+      const title = card.querySelector('h3');
+      const description = card.querySelector('p');
+      const badge = title?.parentElement?.querySelector('span');
+      const noteText = description?.nextElementSibling?.querySelector('[data-item-note], span:last-child');
+      return {
+        id: card.dataset.itemId || '',
+        name: title?.textContent.trim() || '',
+        category: card.dataset.category || 'academic',
+        badge: badge?.textContent.trim() || '',
+        description: description?.textContent.trim() || '',
+        note: noteText?.textContent.trim() || '',
+        noteIcon: description?.nextElementSibling?.querySelector('.material-symbols-outlined')?.textContent.trim() || '',
+        checked: card.classList.contains('checked'),
+        custom: card.dataset.custom === 'true'
+      };
+    });
     writeStorage(storageKeys.checklist, items);
+  }
+
+  function applyChecklistItemDetails(card, item) {
+    const title = card.querySelector('h3');
+    const description = card.querySelector('p');
+    if (!title || !description) return;
+    if (typeof item.name === 'string') title.textContent = item.name;
+    if (typeof item.description === 'string') description.textContent = item.description;
+
+    let badge = title.parentElement?.querySelector('span');
+    if (!badge && title.parentElement) {
+      badge = document.createElement('span');
+      badge.className = 'px-2 py-0.5 rounded-full bg-primary-container/30 text-primary-fixed-dim font-label-sm text-label-sm';
+      title.insertAdjacentElement('afterend', badge);
+    }
+    if (badge && typeof item.badge === 'string') badge.textContent = item.badge;
+    if (typeof item.category === 'string') card.dataset.category = item.category;
+
+    const noteText = typeof item.note === 'string' ? item.note : '';
+    let noteRow = description.nextElementSibling;
+    if (noteText) {
+      if (!noteRow || !noteRow.querySelector('.material-symbols-outlined')) {
+        noteRow = document.createElement('div');
+        noteRow.className = 'flex items-center gap-space-xs mt-1 text-on-surface-variant font-label-sm text-label-sm';
+        const noteIcon = document.createElement('span');
+        noteIcon.className = 'material-symbols-outlined text-[14px] text-tertiary';
+        const noteLabel = document.createElement('span');
+        noteLabel.dataset.itemNote = '';
+        noteRow.append(noteIcon, noteLabel);
+        description.insertAdjacentElement('afterend', noteRow);
+      }
+      noteRow.querySelector('.material-symbols-outlined').textContent = item.noteIcon || 'notifications';
+      noteRow.querySelector('span:last-child').textContent = noteText;
+    } else if (noteRow?.querySelector('.material-symbols-outlined')) {
+      noteRow.remove();
+    }
+
+    const toggle = card.querySelector('.checkbox-btn');
+    if (toggle) toggle.setAttribute('aria-label', `Toggle ${title.textContent.trim()}`);
+    setChecklistState(card, card.classList.contains('checked'));
   }
 
   function restoreChecklist() {
@@ -368,16 +458,118 @@
       return;
     }
     const savedByName = new Map(savedItems.map((item) => [String(item.name).toLocaleLowerCase(), item]));
-    const existing = new Set();
+    const savedById = new Map(savedItems.filter((item) => typeof item.id === 'string' && item.id)
+      .map((item) => [item.id, item]));
+    const existingIds = new Set();
+    const existingNames = new Set();
     container.querySelectorAll('.checklist-item').forEach((card) => {
       const key = itemKey(card);
-      const saved = savedByName.get(key);
-      existing.add(key);
-      if (saved) setChecklistState(card, Boolean(saved.checked));
+      const id = card.dataset.itemId || '';
+      const saved = (id && savedById.get(id)) || savedByName.get(key);
+      if (id) existingIds.add(id);
+      existingNames.add(key);
+      if (saved) {
+        if (!card.dataset.itemId && saved.id) card.dataset.itemId = saved.id;
+        applyChecklistItemDetails(card, saved);
+        setChecklistState(card, Boolean(saved.checked));
+      }
     });
-    savedItems.filter((item) => item.custom && !existing.has(String(item.name).toLocaleLowerCase()))
+    savedItems.filter((item) => item.custom
+      && !existingNames.has(String(item.name).toLocaleLowerCase())
+      && (!item.id || !existingIds.has(item.id)))
       .reverse()
       .forEach((item) => container.insertBefore(makeCustomChecklistCard(item), container.firstChild));
+  }
+
+  function connectChecklistEditing() {
+    const container = document.getElementById('checklistContainer');
+    const dialog = document.getElementById('checklistEditDialog');
+    const form = document.getElementById('checklistEditForm');
+    if (!container || !dialog || !form) return;
+    const nameInput = document.getElementById('checklistEditName');
+    const categoryInput = document.getElementById('checklistEditCategory');
+    const badgeInput = document.getElementById('checklistEditBadge');
+    const descriptionInput = document.getElementById('checklistEditDescription');
+    const noteInput = document.getElementById('checklistEditNote');
+    const deleteButton = document.getElementById('deleteChecklistItemBtn');
+    let editingCard = null;
+
+    const attachEditButton = (card) => {
+      if (card.querySelector('.edit-checklist-item')) return;
+      const title = card.querySelector('h3');
+      if (!title) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'edit-checklist-item min-w-11 min-h-11 rounded-xl bg-surface-container-high text-on-surface-variant active:scale-95';
+      button.setAttribute('aria-label', `Edit ${title.textContent.trim()}`);
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-outlined';
+      icon.textContent = 'edit';
+      button.appendChild(icon);
+      button.addEventListener('click', () => {
+        editingCard = card;
+        const description = card.querySelector('p');
+        const badge = title.parentElement?.querySelector('span');
+        const noteRow = description?.nextElementSibling;
+        nameInput.value = title.textContent.trim();
+        categoryInput.value = card.dataset.category || 'academic';
+        badgeInput.value = badge?.textContent.trim() || '';
+        descriptionInput.value = description?.textContent.trim() || '';
+        noteInput.value = noteRow?.querySelector('span:last-child')?.textContent.trim() || '';
+        deleteButton.hidden = card.dataset.custom !== 'true';
+        dialog.showModal();
+      });
+      card.insertBefore(button, card.querySelector('.checkbox-btn'));
+    };
+
+    container.querySelectorAll('.checklist-item').forEach(attachEditButton);
+    new MutationObserver((records) => {
+      records.forEach((record) => record.addedNodes.forEach((node) => {
+        if (!(node instanceof HTMLElement)) return;
+        if (node.matches('.checklist-item')) attachEditButton(node);
+        node.querySelectorAll?.('.checklist-item').forEach(attachEditButton);
+      }));
+    }).observe(container, { childList: true });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!editingCard) return;
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.setCustomValidity('Enter a name for this item.');
+        nameInput.reportValidity();
+        return;
+      }
+      nameInput.setCustomValidity('');
+      const title = editingCard.querySelector('h3');
+      applyChecklistItemDetails(editingCard, {
+        name,
+        category: categoryInput.value,
+        badge: badgeInput.value.trim(),
+        description: descriptionInput.value.trim(),
+        note: noteInput.value.trim(),
+        noteIcon: editingCard.querySelector('p')?.nextElementSibling?.querySelector('.material-symbols-outlined')?.textContent.trim() || 'notifications'
+      });
+      if (title) {
+        const editButton = editingCard.querySelector('.edit-checklist-item');
+        editButton?.setAttribute('aria-label', `Edit ${title.textContent.trim()}`);
+      }
+      const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+      editingCard.style.display = activeFilter === 'all' || editingCard.dataset.category === activeFilter ? 'flex' : 'none';
+      saveChecklist();
+      dialog.close();
+      showNotice('Checklist item updated.');
+      editingCard = null;
+    });
+    dialog.querySelector('[data-close-checklist-edit]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => { editingCard = null; });
+    deleteButton.addEventListener('click', () => {
+      if (!editingCard || editingCard.dataset.custom !== 'true') return;
+      editingCard.remove();
+      saveChecklist();
+      dialog.close();
+      showNotice('Custom checklist item deleted.');
+    });
   }
 
   function persistChecklistInteractions() {
@@ -871,14 +1063,15 @@
     }).format(dateFromKey(selectedCalendarDate));
     list.replaceChildren();
 
-    const events = [...localEvents, ...googleCalendarEvents]
+    const classEvents = classesForDate(dateFromKey(selectedCalendarDate));
+    const events = [...classEvents, ...localEvents, ...googleCalendarEvents]
       .filter((event) => eventDate(event) === selectedCalendarDate)
       .sort((left, right) => (left.dateTime || `${left.date}T${left.start || '00:00'}`)
         .localeCompare(right.dateTime || `${right.date}T${right.start || '00:00'}`));
     if (!events.length) {
       const empty = document.createElement('p');
       empty.className = 'rounded-xl bg-surface-container-low p-space-md text-body-sm text-body-sm text-on-surface-variant';
-      empty.textContent = 'No events for this day. Add an event or sync Google Calendar.';
+      empty.textContent = 'No classes or events for this day. Add an event or sync Google Calendar.';
       list.appendChild(empty);
       return;
     }
@@ -893,7 +1086,7 @@
       title.textContent = event.title;
       const time = document.createElement('p');
       time.className = 'font-body-sm text-body-sm text-secondary mt-1';
-      time.textContent = `${formatEventTime(event)}${event.source === 'google' ? ' · Google Calendar' : ''}`;
+      time.textContent = `${formatEventTime(event)}${event.source === 'google' ? ' · Google Calendar' : event.source === 'class' ? ' · Class' : ''}`;
       detail.append(title, time);
       if (event.location) {
         const location = document.createElement('p');
@@ -901,8 +1094,15 @@
         location.textContent = event.location;
         detail.appendChild(location);
       }
+      if (event.source === 'class') {
+        const courseDetails = document.createElement('p');
+        courseDetails.className = 'font-body-sm text-body-sm text-on-surface-variant mt-1';
+        courseDetails.textContent = `${event.section} · ${event.units} units · ${event.instructor}`;
+        detail.appendChild(courseDetails);
+        card.classList.add('border-l-2', 'border-primary');
+      }
       card.appendChild(detail);
-      if (event.source !== 'google') {
+      if (event.source === 'local') {
         const remove = document.createElement('button');
         remove.className = 'min-w-10 min-h-10 rounded-lg bg-surface-container-high text-error';
         remove.type = 'button';
@@ -955,7 +1155,8 @@
       }).format(date));
       button.setAttribute('aria-pressed', String(isSelected));
       button.textContent = String(day);
-      const hasEvents = [...localEvents, ...googleCalendarEvents].some((event) => eventDate(event) === key);
+      const hasEvents = classesForDate(date).length > 0
+        || [...localEvents, ...googleCalendarEvents].some((event) => eventDate(event) === key);
       if (hasEvents) {
         const dot = document.createElement('span');
         dot.className = `absolute bottom-1 w-1 h-1 rounded-full ${isSelected ? 'bg-on-primary' : 'bg-secondary'}`;
@@ -1008,6 +1209,52 @@
     const year = String(new Date().getFullYear());
     document.querySelectorAll('[data-current-calendar-year]').forEach((element) => {
       element.textContent = year;
+    });
+  }
+
+  function connectDashboardClassSchedule() {
+    const section = document.getElementById('dashboardClassSchedule');
+    const list = document.getElementById('dashboardClassList');
+    const count = document.getElementById('dashboardClassCount');
+    const dateLabel = document.getElementById('dashboardClassDate');
+    if (!section || !list || !count || !dateLabel) return;
+
+    const today = new Date();
+    const todayClasses = classesForDate(today);
+    dateLabel.textContent = new Intl.DateTimeFormat(undefined, {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+    }).format(today);
+    count.textContent = `${todayClasses.length} ${todayClasses.length === 1 ? 'class' : 'classes'}`;
+    list.replaceChildren();
+
+    if (!todayClasses.length) {
+      const empty = document.createElement('p');
+      empty.className = 'rounded-xl bg-surface-container-low p-space-md text-body-sm text-body-sm text-on-surface-variant';
+      empty.textContent = 'No classes on your timetable today.';
+      list.appendChild(empty);
+      return;
+    }
+
+    todayClasses.forEach((course) => {
+      const card = document.createElement('article');
+      card.className = 'flex items-start justify-between gap-space-sm rounded-xl border-l-2 border-primary bg-surface-container-low p-space-md';
+      const details = document.createElement('div');
+      details.className = 'min-w-0';
+      const title = document.createElement('h4');
+      title.className = 'font-label-lg text-label-lg text-on-surface';
+      title.textContent = course.code;
+      const time = document.createElement('p');
+      time.className = 'font-body-sm text-body-sm text-secondary mt-1';
+      time.textContent = `${formatEventTime(course)} · Room ${course.room}`;
+      const meta = document.createElement('p');
+      meta.className = 'font-body-sm text-body-sm text-on-surface-variant mt-1';
+      meta.textContent = `${course.section} · ${course.units} units`;
+      const instructor = document.createElement('p');
+      instructor.className = 'font-body-sm text-body-sm text-on-surface-variant mt-1';
+      instructor.textContent = course.instructor;
+      details.append(title, time, meta, instructor);
+      card.appendChild(details);
+      list.appendChild(card);
     });
   }
 
@@ -1209,6 +1456,7 @@
   connectNavigation();
   restoreChecklist();
   persistChecklistInteractions();
+  connectChecklistEditing();
   persistDashboardCheckboxes();
   persistScheduleToggles();
   connectSearch();
@@ -1218,6 +1466,7 @@
   connectNightPrepReminder();
   connectReminderShortcuts();
   connectCalendar();
+  connectDashboardClassSchedule();
   updateCurrentCalendarYear();
   initializeAuth();
   connectInstallPrompt();

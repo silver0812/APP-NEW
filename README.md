@@ -6,7 +6,9 @@
 
 PackDay is an installable Progressive Web App (PWA). On Android, open the site in Chrome and choose **Install app** or **Add to Home screen**. On iPhone/iPad, open it in Safari, tap **Share**, then **Add to Home Screen**. Checklist items, profile edits, and events you add are saved on your device. On the first visit after the fresh-start update, PackDay clears the previous sample inputs once; later changes are kept.
 
-The calendar uses your device's local date, year, time, and time zone. You can add device-local events or connect Google Calendar for read-only syncing.
+The calendar uses your device's local date, year, time, and time zone. It includes the weekly class timetable from your schedule: Monday/Thursday (DATAMA2, CLDCOMP, COMSEC1), Tuesday/Friday (WEBPROG, PEMBEDS, MOBPROG), and Friday (PEDUTRI). Classes repeat weekly and appear on the matching calendar dates and dashboard. You can also add device-local events or connect Google Calendar for read-only syncing.
+
+On the checklist, use the pencil button on any item to edit its name, category, badge, details, and note. Changes and custom items are saved on this device.
 
 ## Night prep notification
 

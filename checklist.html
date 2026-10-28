@@ -112,7 +112,7 @@
 <!-- Pack Checklist Deck (Combining Light/Surface card aesthetic with Tactile Checkbox Toggles) -->
 <section class="px-margin-mobile flex flex-col gap-space-sm mb-space-lg" id="checklistContainer">
 <!-- Item 1: Casio fx-991ES Calculator -->
-<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-category="academic">
+<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-item-id="calculator" data-category="academic">
 <div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
 <div class="w-10 h-10 rounded-xl bg-surface-container-highest text-tertiary flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[22px]">calculate</span>
@@ -134,7 +134,7 @@
 </button>
 </article>
 <!-- Item 2: Google Pixel 8 Test Device (Pre-checked) -->
-<article class="checklist-item checked flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low transition-all shadow-sm opacity-90" data-category="tech">
+<article class="checklist-item checked flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low transition-all shadow-sm opacity-90" data-item-id="pixel-device" data-category="tech">
 <div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
 <div class="w-10 h-10 rounded-xl bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[22px]">smartphone</span>
@@ -156,7 +156,7 @@
 </button>
 </article>
 <!-- Item 3: Laptop GaN 65W Charger -->
-<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-category="tech">
+<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-item-id="charger" data-category="tech">
 <div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
 <div class="w-10 h-10 rounded-xl bg-surface-container-highest text-tertiary-fixed-dim flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[22px]">electrical_services</span>
@@ -178,7 +178,7 @@
 </button>
 </article>
 <!-- Item 4: Folding Compact Umbrella -->
-<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-category="personal">
+<article class="checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm" data-item-id="umbrella" data-category="personal">
 <div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
 <div class="w-10 h-10 rounded-xl bg-surface-container-highest text-secondary-fixed-dim flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[22px]">umbrella</span>
@@ -200,7 +200,7 @@
 </button>
 </article>
 <!-- Item 5: APC RFID Campus ID & Keycard (Pre-checked) -->
-<article class="checklist-item checked flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low transition-all shadow-sm opacity-90" data-category="personal">
+<article class="checklist-item checked flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low transition-all shadow-sm opacity-90" data-item-id="campus-id" data-category="personal">
 <div class="flex items-start gap-space-sm min-w-0 pr-space-xs">
 <div class="w-10 h-10 rounded-xl bg-primary-container/20 text-primary flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[22px]">badge</span>
@@ -318,6 +318,7 @@
       if (!val) return;
 
       const newCard = document.createElement('article');
+      newCard.dataset.itemId = `custom-${window.crypto?.randomUUID ? window.crypto.randomUUID() : Date.now()}`;
       newCard.setAttribute('data-category', 'academic');
       newCard.setAttribute('data-custom', 'true');
       newCard.className = 'checklist-item flex items-center justify-between p-space-md rounded-2xl bg-surface-container-high transition-all shadow-sm';
@@ -337,13 +338,16 @@
       const title = document.createElement('h3');
       title.className = 'font-headline-sm text-headline-sm text-on-surface truncate';
       title.textContent = val;
+      title.dataset.itemTitle = '';
       const badge = document.createElement('span');
       badge.className = 'px-2 py-0.5 rounded-full bg-primary-container/30 text-primary-fixed-dim font-label-sm text-label-sm';
       badge.textContent = 'Custom';
+      badge.dataset.itemBadge = '';
       heading.append(title, badge);
       const description = document.createElement('p');
       description.className = 'font-body-sm text-body-sm text-on-surface-variant truncate';
       description.textContent = 'Added for tomorrow';
+      description.dataset.itemDescription = '';
       details.append(heading, description);
       content.append(iconBox, details);
 
@@ -370,6 +374,34 @@
       });
     }
   })();
-</script></main><div class="fixed bottom-0 w-full z-50 pointer-events-none pb-safe"><div class="px-margin-mobile pb-space-sm flex justify-center"><nav class="pointer-events-auto w-full max-w-md bg-surface-container-low/90 backdrop-blur-xl rounded-full shadow-[0_12px_32px_rgba(0,0,0,0.55)] px-space-xs py-space-xs flex items-center justify-between" data-active-classes="text-primary font-label-md"><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-sm text-label-sm mt-0.5">Dashboard</span></a><a aria-current="page" class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 transition-colors text-primary font-label-md" data-path="checklist" href="#"><span class="material-symbols-outlined text-[20px]">checklist</span><span class="font-label-sm text-label-sm mt-0.5">Checklist</span></a><div class="flex items-center justify-center px-space-xs"><a aria-label="Quick Add Item" class="w-11 h-11 rounded-full bg-on-surface text-surface flex items-center justify-center shadow-[0_4px_16px_rgba(255,255,255,0.2)] active:scale-95 transition-transform" data-path="add-gear-item" href="#"><span class="material-symbols-outlined text-[22px]">add</span></a></div><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="schedule" href="#"><span class="material-symbols-outlined text-[20px]">calendar_today</span><span class="font-label-sm text-label-sm mt-0.5">Schedule</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="gear-radar" href="#"><span class="material-symbols-outlined text-[20px]">explore</span><span class="font-label-sm text-label-sm mt-0.5">Item Finder</span></a></nav></div></div>
+</script>
+<dialog id="checklistEditDialog" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-outline-variant bg-surface-container p-space-md text-on-surface shadow-2xl backdrop:bg-surface-container-lowest/80">
+<form id="checklistEditForm" class="flex flex-col gap-space-sm">
+<h2 class="font-headline-md text-headline-md">Edit checklist item</h2>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Item name
+<input id="checklistEditName" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="100" required>
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Category
+<select id="checklistEditCategory" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface">
+<option value="academic">Academic</option><option value="tech">Tech</option><option value="personal">Personal</option>
+</select>
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Badge
+<input id="checklistEditBadge" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="40">
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Details
+<input id="checklistEditDescription" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="120">
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Reminder or note
+<input id="checklistEditNote" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="120">
+</label>
+<div class="flex gap-space-sm pt-space-xs">
+<button class="flex-1 min-h-11 rounded-full bg-surface-container-high font-label-md text-label-md" type="button" data-close-checklist-edit>Cancel</button>
+<button class="flex-1 min-h-11 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="submit">Save item</button>
+</div>
+<button id="deleteChecklistItemBtn" class="min-h-11 rounded-full bg-error-container text-on-error-container font-label-md text-label-md" type="button" hidden>Delete custom item</button>
+</form>
+</dialog>
+<div class="fixed bottom-0 w-full z-50 pointer-events-none pb-safe"><div class="px-margin-mobile pb-space-sm flex justify-center"><nav class="pointer-events-auto w-full max-w-md bg-surface-container-low/90 backdrop-blur-xl rounded-full shadow-[0_12px_32px_rgba(0,0,0,0.55)] px-space-xs py-space-xs flex items-center justify-between" data-active-classes="text-primary font-label-md"><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-sm text-label-sm mt-0.5">Dashboard</span></a><a aria-current="page" class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 transition-colors text-primary font-label-md" data-path="checklist" href="#"><span class="material-symbols-outlined text-[20px]">checklist</span><span class="font-label-sm text-label-sm mt-0.5">Checklist</span></a><div class="flex items-center justify-center px-space-xs"><a aria-label="Quick Add Item" class="w-11 h-11 rounded-full bg-on-surface text-surface flex items-center justify-center shadow-[0_4px_16px_rgba(255,255,255,0.2)] active:scale-95 transition-transform" data-path="add-gear-item" href="#"><span class="material-symbols-outlined text-[22px]">add</span></a></div><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="schedule" href="#"><span class="material-symbols-outlined text-[20px]">calendar_today</span><span class="font-label-sm text-label-sm mt-0.5">Schedule</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="gear-radar" href="#"><span class="material-symbols-outlined text-[20px]">explore</span><span class="font-label-sm text-label-sm mt-0.5">Item Finder</span></a></nav></div></div>
 
 <script src="./app.js" defer></script></body></html>

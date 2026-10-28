@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'packday-shell-v5';
+const CACHE_NAME = 'packday-shell-v8';
 const APP_FILES = [
   './',
   './index.html',

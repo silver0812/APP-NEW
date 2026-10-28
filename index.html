@@ -10,13 +10,13 @@
 <div class="flex flex-col">
 <div class="flex items-center gap-space-xs">
 <span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(78,222,163,0.8)] animate-pulse"></span>
-<span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Smart Telemetry Active</span>
+<span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Weekly timetable</span>
 </div>
-<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight mt-0.5">Tuesday Campus Sync</h2>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight mt-0.5">Your class schedule</h2>
 </div>
 <div class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
-<span class="material-symbols-outlined text-[15px] text-tertiary">wb_twilight</span>
-<span class="">Pack by 21:30</span>
+<span class="material-symbols-outlined text-[15px] text-tertiary">event_repeat</span>
+<span class="">Repeats weekly</span>
 </div>
 </div>
 <!-- Playful Hero Mascot & Readiness Banner (Inspired by Image 4 'Ты молодец!') -->
@@ -103,7 +103,7 @@
 </div>
 </div>
 <!-- Academic Timetable & Mandatory Gear Deck (Inspired by Image 4 schedule slots) -->
-<div class="px-margin-mobile mt-space-md">
+<div id="sampleClassDeck" class="px-margin-mobile mt-space-md" hidden>
 <div class="flex items-center justify-between mb-space-xs">
 <div class="flex items-center gap-space-xs">
 <span class="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
@@ -210,6 +210,19 @@
 </div>
 </div>
 <!-- Night-Before Bag Readiness Radar Preview (Inspired by Image 3 GPS Radar telemetry) -->
+<section id="dashboardClassSchedule" class="px-margin-mobile mt-space-md flex flex-col gap-space-sm" aria-labelledby="dashboardClassHeading">
+<div class="flex items-center justify-between gap-space-sm">
+<div>
+<h3 id="dashboardClassHeading" class="font-headline-sm text-headline-sm text-on-surface">Today's class schedule</h3>
+<p id="dashboardClassDate" class="font-body-sm text-body-sm text-on-surface-variant mt-1"></p>
+</div>
+<span id="dashboardClassCount" class="font-label-sm text-label-sm text-secondary text-right"></span>
+</div>
+<div id="dashboardClassList" class="flex flex-col gap-space-sm" aria-live="polite"></div>
+<a class="self-end min-h-11 inline-flex items-center gap-1 px-3 rounded-full bg-surface-container-high text-primary font-label-md text-label-md" data-path="schedule" href="#">
+<span>Open full timetable</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</section>
 
 <!-- Smart Quick Add / Checklist Micro-card -->
 <div class="px-margin-mobile my-space-xs">
