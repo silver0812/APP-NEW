@@ -19,3 +19,5 @@ If you prefer the Android app download, [download the APK](./PackDay.apk). Andro
 Serve this folder over HTTP, for example: `py -m http.server 8000`, then open `http://localhost:8000`.
 
 When updating the app shell, increment `CACHE_NAME` in `sw.js` so installed copies replace the previous cached files.
+
+GitHub Pages is published from the `main` branch using the `Deploy PackDay website` workflow in `.github/workflows/deploy-pages.yml`.
