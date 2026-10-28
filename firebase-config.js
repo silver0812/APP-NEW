@@ -1,0 +1,1 @@
+window.PACKDAY_FIREBASE_CONFIG = null;

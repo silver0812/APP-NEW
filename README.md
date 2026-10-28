@@ -4,11 +4,34 @@
 
 **[Open the PackDay website](https://silver0812.github.io/APP-NEW/)**
 
-PackDay is an installable Progressive Web App (PWA). On Android, open the site in Chrome and choose **Install app** or **Add to Home screen**. On iPhone/iPad, open it in Safari, tap **Share**, then **Add to Home Screen**. Checklist items and packing progress are saved on your device.
+PackDay is an installable Progressive Web App (PWA). On Android, open the site in Chrome and choose **Install app** or **Add to Home screen**. On iPhone/iPad, open it in Safari, tap **Share**, then **Add to Home Screen**. Checklist items, profile edits, and events you add are saved on your device. On the first visit after the fresh-start update, PackDay clears the previous sample inputs once; later changes are kept.
 
-The website's layout and styling are bundled. Google Fonts, Material Symbols, and a sample image may still need an internet connection.
+The calendar uses your device's local date, time, and time zone. You can add device-local events or connect Google Calendar for read-only syncing.
 
-Campus locations, schedules, and notification content are sample data; there is no campus backend or account synchronization.
+## Google sign-in and calendar setup
+
+Google sign-in and calendar sync need a Firebase project owned by the app operator. Until it is configured, profile editing and local calendar events still work, while Google buttons explain that setup is needed.
+
+1. In the [Firebase Console](https://console.firebase.google.com/), create a project and add a **Web app**. Copy its Firebase web configuration.
+2. In **Authentication → Sign-in method**, enable **Google**. Add `silver0812.github.io` under **Authentication → Settings → Authorized domains**.
+3. In the linked Google Cloud project, enable the **Google Calendar API**. If the OAuth consent screen is in testing, add the Google account you will use as a test user.
+4. In `firebase-config.js`, replace `null` with the web configuration object from Firebase, for example:
+
+   ```js
+   window.PACKDAY_FIREBASE_CONFIG = {
+     apiKey: "YOUR_FIREBASE_WEB_API_KEY",
+     authDomain: "YOUR_PROJECT.firebaseapp.com",
+     projectId: "YOUR_PROJECT_ID",
+     appId: "YOUR_FIREBASE_APP_ID"
+   };
+   ```
+
+   These are public web-app settings, not service-account credentials. Never put a Firebase service-account key or private OAuth client secret in this website.
+5. Redeploy the site and open it online. Sign in with Google and approve the requested read-only Calendar permission.
+
+Google authentication verifies the account with Firebase, but profile customizations and PackDay-created events remain on that browser/device; this static site does not provide cloud backup or cross-device syncing. Calendar access is read-only: edits made on Google Calendar appear after you sync again, and PackDay does not change Google events.
+
+The website's layout and styling are bundled. Google Fonts and Material Symbols may still need an internet connection.
 
 ## Android APK
 

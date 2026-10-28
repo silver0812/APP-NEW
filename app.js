@@ -15,8 +15,12 @@
   const storageKeys = {
     checklist: 'packday.checklist.v1',
     dashboard: 'packday.dashboard.v1',
-    schedule: 'packday.schedule.v1'
+    schedule: 'packday.schedule.v1',
+    profile: 'packday.profile.v1',
+    events: 'packday.events.v1',
+    freshStart: 'packday.fresh-start.v2'
   };
+  const defaultProfilePhoto = './icons/profile-placeholder.svg';
 
   function readStorage(key, fallback) {
     try {
@@ -31,9 +35,11 @@
   function writeStorage(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
+      return true;
     } catch (error) {
       console.error(`PackDay could not save data for "${key}".`, error);
       showNotice('Changes could not be saved on this device.');
+      return false;
     }
   }
 
@@ -95,7 +101,12 @@
       profileLink.href = routes['profile-settings'];
       profileLink.className = avatar.className;
       profileLink.setAttribute('aria-label', 'Profile');
-      avatar.childNodes.forEach((node) => profileLink.appendChild(node.cloneNode(true)));
+      const image = document.createElement('img');
+      image.className = 'w-8 h-8 rounded-full object-cover';
+      image.dataset.profileAvatar = '';
+      image.src = defaultProfilePhoto;
+      image.alt = 'Default profile photo';
+      profileLink.appendChild(image);
       avatar.replaceWith(profileLink);
     });
 
@@ -388,6 +399,589 @@
     });
   }
 
+  function resetSavedDataForFreshStart() {
+    try {
+      if (localStorage.getItem(storageKeys.freshStart) === 'done') return;
+      [storageKeys.checklist, storageKeys.dashboard, storageKeys.schedule, storageKeys.profile, storageKeys.events]
+        .forEach((key) => localStorage.removeItem(key));
+      localStorage.setItem(storageKeys.freshStart, 'done');
+    } catch (error) {
+      console.error('PackDay could not reset the previous saved app data.', error);
+      showNotice('Previous app data could not be cleared on this device.');
+    }
+  }
+
+  function loadProfile() {
+    const saved = readStorage(storageKeys.profile, {});
+    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return { name: '', photo: '', accountUid: '', email: '' };
+    return {
+      name: typeof saved.name === 'string' ? saved.name : '',
+      photo: typeof saved.photo === 'string' ? saved.photo : '',
+      accountUid: typeof saved.accountUid === 'string' ? saved.accountUid : '',
+      email: typeof saved.email === 'string' ? saved.email : ''
+    };
+  }
+
+  resetSavedDataForFreshStart();
+  let profile = loadProfile();
+  let googleUser = null;
+  let authConfigured = false;
+
+  function renderProfile() {
+    const name = profile.name.trim();
+    const nameLabel = name || 'Your name';
+    const shortName = name ? name.split(/\s+/)[0] : 'Profile';
+    document.querySelectorAll('[data-profile-name]').forEach((element) => { element.textContent = nameLabel; });
+    document.querySelectorAll('[data-profile-short-name]').forEach((element) => { element.textContent = shortName; });
+    document.querySelectorAll('[data-profile-avatar]').forEach((image) => {
+      image.src = profile.photo || defaultProfilePhoto;
+      image.alt = name ? `${name}'s profile photo` : 'Default profile photo';
+    });
+
+    const status = document.querySelector('[data-profile-status]');
+    if (status) status.textContent = googleUser ? 'Google account' : authConfigured ? 'Not signed in' : 'Local profile';
+    const email = document.querySelector('[data-profile-email]');
+    if (email) email.textContent = googleUser?.email || 'Saved on this device';
+    const accountNote = document.querySelector('[data-profile-account-note]');
+    if (accountNote) {
+      accountNote.textContent = googleUser
+        ? 'Google account connected'
+        : authConfigured ? 'Sign in to connect your account' : 'Google sign-in setup is required';
+    }
+
+    const signInButton = document.getElementById('googleSignInBtn');
+    const setupHint = document.querySelector('[data-google-setup-hint]');
+    if (setupHint) setupHint.hidden = authConfigured;
+    const signInLabel = document.querySelector('[data-google-sign-in-label]');
+    if (signInLabel) signInLabel.textContent = googleUser ? 'Switch Google account' : 'Sign up or sign in with Google';
+    if (signInButton) signInButton.disabled = false;
+    const signOutButton = document.getElementById('signOutBtn');
+    if (signOutButton) {
+      signOutButton.disabled = !googleUser;
+      signOutButton.setAttribute('aria-disabled', String(!googleUser));
+    }
+  }
+
+  function profileImageData(file) {
+    return new Promise((resolve, reject) => {
+      if (!file.type.startsWith('image/')) {
+        reject(new Error('Choose an image file for your profile photo.'));
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        reject(new Error('Choose a photo smaller than 8 MB.'));
+        return;
+      }
+      const objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        try {
+          if (!image.naturalWidth || !image.naturalHeight) throw new Error('This photo could not be opened.');
+          const canvas = document.createElement('canvas');
+          const size = 320;
+          const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight, 1);
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('This photo could not be processed on your device.');
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        } catch (error) {
+          reject(error);
+        }
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('This photo could not be opened.'));
+      };
+      image.src = objectUrl;
+    });
+  }
+
+  function connectProfile() {
+    const editButton = document.getElementById('editProfileBtn');
+    const dialog = document.getElementById('profileEditDialog');
+    const form = document.getElementById('profileEditForm');
+    const nameInput = document.getElementById('profileNameInput');
+    const photoInput = document.getElementById('profilePhotoInput');
+    const photoPreview = document.getElementById('profileEditPreview');
+    const removePhotoButton = document.getElementById('removeProfilePhotoBtn');
+    const saveButton = form?.querySelector('button[type="submit"]');
+    let editedPhoto = profile.photo;
+    let photoLoading = false;
+
+    if (editButton && dialog && form && nameInput && photoInput && removePhotoButton) {
+      editButton.addEventListener('click', () => {
+        nameInput.value = profile.name;
+        photoInput.value = '';
+        editedPhoto = profile.photo;
+        if (photoPreview) photoPreview.src = editedPhoto || defaultProfilePhoto;
+        dialog.showModal();
+      });
+      photoInput.addEventListener('change', async () => {
+        const file = photoInput.files?.[0];
+        if (!file) return;
+        photoLoading = true;
+        if (saveButton) saveButton.disabled = true;
+        try {
+          editedPhoto = await profileImageData(file);
+          if (photoPreview) photoPreview.src = editedPhoto;
+        } catch (error) {
+          console.error('PackDay could not load the selected profile photo.', error);
+          showNotice(error.message);
+          photoInput.value = '';
+          if (photoPreview) photoPreview.src = editedPhoto || defaultProfilePhoto;
+        } finally {
+          photoLoading = false;
+          if (saveButton) saveButton.disabled = false;
+        }
+      });
+      removePhotoButton.addEventListener('click', () => {
+        editedPhoto = '';
+        photoInput.value = '';
+        if (photoPreview) photoPreview.src = defaultProfilePhoto;
+        showNotice('The default profile photo will be used.');
+      });
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (photoLoading) {
+          showNotice('Wait for the profile photo to finish loading.');
+          return;
+        }
+        const nextName = nameInput.value.trim();
+        if (!nextName) {
+          nameInput.setCustomValidity('Enter a name for your profile.');
+          nameInput.reportValidity();
+          return;
+        }
+        nameInput.setCustomValidity('');
+        profile = { ...profile, name: nextName, photo: editedPhoto };
+        if (writeStorage(storageKeys.profile, profile)) {
+          renderProfile();
+          dialog.close();
+          showNotice('Profile saved on this device.');
+        }
+      });
+      dialog.querySelector('[data-close-profile]')?.addEventListener('click', () => dialog.close());
+    }
+
+    document.getElementById('googleSignInBtn')?.addEventListener('click', async () => {
+      if (!authConfigured || !window.packdayAuth) {
+        showNotice('Google sign-in needs Firebase setup before it can be used.');
+        return;
+      }
+      try {
+        await window.packdayAuth.signIn();
+      } catch (error) {
+        console.error('PackDay Google sign-in failed.', error);
+        showNotice(error.code === 'auth/popup-closed-by-user' ? 'Google sign-in was cancelled.' : 'Google sign-in failed. Check your connection and account settings.');
+      }
+    });
+
+    document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+      if (!googleUser || !window.packdayAuth) {
+        showNotice('No Google account is signed in.');
+        return;
+      }
+      try {
+        await window.packdayAuth.signOut();
+      } catch (error) {
+        console.error('PackDay could not sign out of Google.', error);
+        showNotice('Sign out failed. Please try again.');
+      }
+    });
+
+    window.addEventListener('packday-auth-state', (event) => {
+      authConfigured = Boolean(event.detail?.configured);
+      googleUser = event.detail?.user || null;
+      if (googleUser) {
+        if (profile.accountUid !== googleUser.uid) {
+          profile = {
+            name: googleUser.displayName || '',
+            photo: googleUser.photoURL || '',
+            accountUid: googleUser.uid,
+            email: googleUser.email || ''
+          };
+        } else {
+          profile.email = googleUser.email || '';
+          if (!profile.name) profile.name = googleUser.displayName || '';
+          if (!profile.photo) profile.photo = googleUser.photoURL || '';
+        }
+        writeStorage(storageKeys.profile, profile);
+      } else if (authConfigured && profile.accountUid) {
+        profile = { name: '', photo: '', accountUid: '', email: '' };
+        writeStorage(storageKeys.profile, profile);
+      }
+      renderProfile();
+    });
+    renderProfile();
+  }
+
+  function initializeAuth() {
+    const config = window.PACKDAY_FIREBASE_CONFIG;
+    if (!config || !config.apiKey || !config.authDomain || !config.projectId || !config.appId) {
+      window.dispatchEvent(new CustomEvent('packday-auth-state', {
+        detail: { configured: false, user: null }
+      }));
+      return;
+    }
+    import('./firebase-auth.js')
+      .then(({ initializePackDayAuth }) => initializePackDayAuth(config))
+      .catch((error) => {
+        console.error('PackDay could not initialize Google sign-in.', error);
+        showNotice('Google sign-in could not start. Check the Firebase configuration and internet connection.');
+      });
+  }
+
+  function dateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function dateFromKey(key) {
+    const [year, month, day] = key.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  function localMonthRange(date) {
+    const start = new Date(date.getFullYear(), date.getMonth(), 1);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+    return { start, end };
+  }
+
+  function getLocalEvents() {
+    const events = readStorage(storageKeys.events, []);
+    return Array.isArray(events) ? events.filter((event) =>
+      event && typeof event.id === 'string'
+      && typeof event.title === 'string'
+      && typeof event.date === 'string'
+      && typeof event.start === 'string'
+      && typeof event.end === 'string'
+    ) : [];
+  }
+
+  let localEvents = getLocalEvents();
+  let googleCalendarEvents = [];
+  let selectedCalendarDate = dateKey(new Date());
+  let displayedCalendarMonth = new Date();
+  let liveCalendarToday = selectedCalendarDate;
+
+  function setDisplayedCalendarMonth(date) {
+    const nextMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const changed = nextMonth.getFullYear() !== displayedCalendarMonth.getFullYear()
+      || nextMonth.getMonth() !== displayedCalendarMonth.getMonth();
+    displayedCalendarMonth = nextMonth;
+    if (changed) {
+      googleCalendarEvents = [];
+      const status = document.getElementById('calendarConnectionStatus');
+      if (authConfigured && status) status.textContent = 'Sync Google Calendar to load events for this month.';
+    }
+  }
+
+  function eventDate(event) {
+    if (event.source === 'google' && event.dateTime) return dateKey(new Date(event.dateTime));
+    return event.date;
+  }
+
+  function formatEventTime(event) {
+    if (event.allDay) return 'All day';
+    const format = (value) => new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' })
+      .format(new Date(value));
+    if (event.dateTime) return `${format(event.dateTime)}${event.endDateTime ? `–${format(event.endDateTime)}` : ''}`;
+    const formatLocal = (value) => {
+      const [hour, minute] = value.split(':').map(Number);
+      return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' })
+        .format(new Date(2000, 0, 1, hour, minute));
+    };
+    return `${formatLocal(event.start)}–${formatLocal(event.end)}`;
+  }
+
+  function renderCalendarEvents() {
+    const list = document.getElementById('calendarEvents');
+    const selectedLabel = document.getElementById('selectedCalendarDay');
+    if (!list || !selectedLabel) return;
+    selectedLabel.textContent = new Intl.DateTimeFormat(undefined, {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+    }).format(dateFromKey(selectedCalendarDate));
+    list.replaceChildren();
+
+    const events = [...localEvents, ...googleCalendarEvents]
+      .filter((event) => eventDate(event) === selectedCalendarDate)
+      .sort((left, right) => (left.dateTime || `${left.date}T${left.start || '00:00'}`)
+        .localeCompare(right.dateTime || `${right.date}T${right.start || '00:00'}`));
+    if (!events.length) {
+      const empty = document.createElement('p');
+      empty.className = 'rounded-xl bg-surface-container-low p-space-md text-body-sm text-body-sm text-on-surface-variant';
+      empty.textContent = 'No events for this day. Add an event or sync Google Calendar.';
+      list.appendChild(empty);
+      return;
+    }
+
+    events.forEach((event) => {
+      const card = document.createElement('article');
+      card.className = 'flex items-start justify-between gap-space-sm rounded-xl bg-surface-container-low p-space-md';
+      const detail = document.createElement('div');
+      detail.className = 'min-w-0';
+      const title = document.createElement('h3');
+      title.className = 'font-label-lg text-label-lg text-on-surface break-words';
+      title.textContent = event.title;
+      const time = document.createElement('p');
+      time.className = 'font-body-sm text-body-sm text-secondary mt-1';
+      time.textContent = `${formatEventTime(event)}${event.source === 'google' ? ' · Google Calendar' : ''}`;
+      detail.append(title, time);
+      if (event.location) {
+        const location = document.createElement('p');
+        location.className = 'font-body-sm text-body-sm text-on-surface-variant mt-1';
+        location.textContent = event.location;
+        detail.appendChild(location);
+      }
+      card.appendChild(detail);
+      if (event.source !== 'google') {
+        const remove = document.createElement('button');
+        remove.className = 'min-w-10 min-h-10 rounded-lg bg-surface-container-high text-error';
+        remove.type = 'button';
+        remove.setAttribute('aria-label', `Delete ${event.title}`);
+        const icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined';
+        icon.textContent = 'delete';
+        remove.appendChild(icon);
+        remove.addEventListener('click', () => {
+          localEvents = localEvents.filter((item) => item.id !== event.id);
+          if (writeStorage(storageKeys.events, localEvents)) renderCalendar();
+        });
+        card.appendChild(remove);
+      }
+      list.appendChild(card);
+    });
+  }
+
+  function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    const monthLabel = document.getElementById('calendarMonthLabel');
+    const dateLabel = document.getElementById('liveCalendarDate');
+    if (!grid || !monthLabel || !dateLabel) return;
+    const today = new Date();
+    dateLabel.textContent = new Intl.DateTimeFormat(undefined, {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+    }).format(today);
+    monthLabel.textContent = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' })
+      .format(displayedCalendarMonth);
+    grid.replaceChildren();
+
+    const first = new Date(displayedCalendarMonth.getFullYear(), displayedCalendarMonth.getMonth(), 1);
+    const daysInMonth = new Date(displayedCalendarMonth.getFullYear(), displayedCalendarMonth.getMonth() + 1, 0).getDate();
+    for (let blank = 0; blank < first.getDay(); blank += 1) {
+      const spacer = document.createElement('span');
+      spacer.setAttribute('aria-hidden', 'true');
+      grid.appendChild(spacer);
+    }
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const date = new Date(displayedCalendarMonth.getFullYear(), displayedCalendarMonth.getMonth(), day);
+      const key = dateKey(date);
+      const button = document.createElement('button');
+      const isSelected = key === selectedCalendarDate;
+      const isToday = key === dateKey(today);
+      button.type = 'button';
+      button.className = `relative min-h-11 rounded-xl flex flex-col items-center justify-center font-label-md text-label-md ${isSelected ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface'} ${isToday && !isSelected ? 'ring-1 ring-secondary' : ''}`;
+      button.setAttribute('role', 'gridcell');
+      button.setAttribute('aria-label', new Intl.DateTimeFormat(undefined, {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+      }).format(date));
+      button.setAttribute('aria-pressed', String(isSelected));
+      button.textContent = String(day);
+      const hasEvents = [...localEvents, ...googleCalendarEvents].some((event) => eventDate(event) === key);
+      if (hasEvents) {
+        const dot = document.createElement('span');
+        dot.className = `absolute bottom-1 w-1 h-1 rounded-full ${isSelected ? 'bg-on-primary' : 'bg-secondary'}`;
+        dot.setAttribute('aria-hidden', 'true');
+        button.appendChild(dot);
+      }
+      button.addEventListener('click', () => {
+        selectedCalendarDate = key;
+        document.getElementById('calendarDatePicker').value = key;
+        renderCalendar();
+      });
+      grid.appendChild(button);
+    }
+    renderCalendarEvents();
+  }
+
+  function updateLiveClock() {
+    const now = new Date();
+    const clock = document.getElementById('liveClock');
+    const timeZone = document.getElementById('calendarTimeZone');
+    const dateLabel = document.getElementById('liveCalendarDate');
+    if (clock) {
+      clock.dateTime = now.toISOString();
+      clock.textContent = new Intl.DateTimeFormat(undefined, {
+        hour: 'numeric', minute: '2-digit', second: '2-digit'
+      }).format(now);
+    }
+    if (timeZone) timeZone.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
+    if (dateLabel) {
+      dateLabel.textContent = new Intl.DateTimeFormat(undefined, {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+      }).format(now);
+    }
+    const todayKey = dateKey(now);
+    if (todayKey !== liveCalendarToday) {
+      const previousToday = liveCalendarToday;
+      liveCalendarToday = todayKey;
+      if (selectedCalendarDate === previousToday) {
+        selectedCalendarDate = todayKey;
+        setDisplayedCalendarMonth(now);
+        const datePicker = document.getElementById('calendarDatePicker');
+        if (datePicker) datePicker.value = todayKey;
+      }
+      renderCalendar();
+    }
+  }
+
+  function connectCalendar() {
+    const section = document.getElementById('liveCalendarSection');
+    if (!section) return;
+    const datePicker = document.getElementById('calendarDatePicker');
+    const eventDialog = document.getElementById('calendarEventDialog');
+    const eventForm = document.getElementById('calendarEventForm');
+    const connectionStatus = document.getElementById('calendarConnectionStatus');
+
+    document.getElementById('calendarPrevMonth').addEventListener('click', () => {
+      setDisplayedCalendarMonth(new Date(displayedCalendarMonth.getFullYear(), displayedCalendarMonth.getMonth() - 1, 1));
+      selectedCalendarDate = dateKey(displayedCalendarMonth);
+      datePicker.value = selectedCalendarDate;
+      renderCalendar();
+    });
+    document.getElementById('calendarNextMonth').addEventListener('click', () => {
+      setDisplayedCalendarMonth(new Date(displayedCalendarMonth.getFullYear(), displayedCalendarMonth.getMonth() + 1, 1));
+      selectedCalendarDate = dateKey(displayedCalendarMonth);
+      datePicker.value = selectedCalendarDate;
+      renderCalendar();
+    });
+    document.getElementById('calendarTodayBtn').addEventListener('click', () => {
+      const today = new Date();
+      selectedCalendarDate = dateKey(today);
+      setDisplayedCalendarMonth(today);
+      datePicker.value = selectedCalendarDate;
+      renderCalendar();
+    });
+    datePicker.addEventListener('change', () => {
+      if (!datePicker.value) return;
+      selectedCalendarDate = datePicker.value;
+      const date = dateFromKey(selectedCalendarDate);
+      setDisplayedCalendarMonth(date);
+      renderCalendar();
+    });
+    document.getElementById('calendarAddEventBtn').addEventListener('click', () => {
+      const date = dateFromKey(selectedCalendarDate);
+      const start = new Date();
+      start.setHours(start.getHours() + 1, 0, 0, 0);
+      const end = new Date(start.getTime() + 60 * 60 * 1000);
+      const timeValue = (value) => `${String(value.getHours()).padStart(2, '0')}:${String(value.getMinutes()).padStart(2, '0')}`;
+      document.getElementById('eventDateInput').value = dateKey(date);
+      document.getElementById('eventStartInput').value = timeValue(start);
+      document.getElementById('eventEndInput').value = timeValue(end);
+      eventDialog.showModal();
+    });
+    eventDialog.querySelector('[data-close-event]')?.addEventListener('click', () => eventDialog.close());
+    eventForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const title = document.getElementById('eventTitleInput').value.trim();
+      const date = document.getElementById('eventDateInput').value;
+      const start = document.getElementById('eventStartInput').value;
+      const end = document.getElementById('eventEndInput').value;
+      if (!title || !date || !start || !end || end <= start) {
+        showNotice('Enter an event name and a valid start and end time.');
+        return;
+      }
+      localEvents.push({
+        id: window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+        title,
+        date,
+        start,
+        end,
+        location: document.getElementById('eventLocationInput').value.trim(),
+        source: 'local'
+      });
+      if (writeStorage(storageKeys.events, localEvents)) {
+        selectedCalendarDate = date;
+        setDisplayedCalendarMonth(dateFromKey(date));
+        datePicker.value = date;
+        eventForm.reset();
+        eventDialog.close();
+        renderCalendar();
+        showNotice('Event saved on this device.');
+      }
+    });
+    document.getElementById('calendarSyncGoogleBtn').addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      if (!authConfigured || !window.packdayAuth) {
+        showNotice('Google Calendar sync needs Firebase setup first.');
+        if (connectionStatus) connectionStatus.textContent = 'Set up Google sign-in to connect your calendar. Events you add here are saved on this device.';
+        return;
+      }
+      button.disabled = true;
+      if (connectionStatus) connectionStatus.textContent = 'Connect your Google account and approve read-only Calendar access.';
+      try {
+        const token = await window.packdayAuth.getCalendarAccessToken();
+        const { start, end } = localMonthRange(displayedCalendarMonth);
+        const params = new URLSearchParams({
+          timeMin: start.toISOString(),
+          timeMax: end.toISOString(),
+          singleEvents: 'true',
+          orderBy: 'startTime',
+          maxResults: '250'
+        });
+        const items = [];
+        let pageToken = '';
+        do {
+          if (pageToken) params.set('pageToken', pageToken);
+          const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!response.ok) throw new Error(`Google Calendar returned HTTP ${response.status}.`);
+          const data = await response.json();
+          items.push(...(data.items || []));
+          pageToken = data.nextPageToken || '';
+        } while (pageToken);
+        googleCalendarEvents = items
+          .filter((item) => item.status !== 'cancelled' && item.start && (item.start.dateTime || item.start.date))
+          .map((item) => ({
+            id: item.id,
+            title: item.summary || 'Untitled event',
+            location: item.location || '',
+            source: 'google',
+            date: item.start.date || dateKey(new Date(item.start.dateTime)),
+            dateTime: item.start.dateTime || '',
+            endDateTime: item.end?.dateTime || '',
+            allDay: Boolean(item.start.date)
+          }));
+        renderCalendar();
+        if (connectionStatus) connectionStatus.textContent = `${googleCalendarEvents.length} Google Calendar event${googleCalendarEvents.length === 1 ? '' : 's'} loaded for this month.`;
+      } catch (error) {
+        console.error('PackDay could not sync Google Calendar.', error);
+        showNotice(error.message.includes('HTTP 403')
+          ? 'Google Calendar access is not enabled for this project yet.'
+          : 'Google Calendar sync failed. Check permissions and try again.');
+        if (connectionStatus) connectionStatus.textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    datePicker.value = selectedCalendarDate;
+    updateLiveClock();
+    renderCalendar();
+    window.setInterval(updateLiveClock, 1000);
+    window.addEventListener('packday-auth-state', (event) => {
+      if (connectionStatus && !event.detail?.configured) {
+        connectionStatus.textContent = 'Set up Google sign-in to connect your calendar. Events you add here are saved on this device.';
+      }
+    });
+  }
+
   function connectInstallPrompt() {
     const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
@@ -449,6 +1043,9 @@
   connectSearch();
   connectDashboardCategories();
   connectNotices();
+  connectProfile();
+  connectCalendar();
+  initializeAuth();
   connectInstallPrompt();
   registerServiceWorker();
 

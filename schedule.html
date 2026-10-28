@@ -5,8 +5,46 @@
     }
   </style>
   <link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#10141a"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="PackDay"><link rel="apple-touch-icon" href="./icons/packday.svg"><title>PackDay ? Schedule</title><link rel="icon" type="image/svg+xml" href="./icons/packday.svg"></head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.12)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-secondary shadow-[0_0_12px_rgba(78,222,163,0.25)]"><span class="material-symbols-outlined text-[20px]">backpack</span></div><div class="flex flex-col"><span class="font-label-lg text-label-lg tracking-tight text-on-surface leading-none">PackDay</span><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">Schedule</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-xl active:scale-95 transition-all"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full pb-6">
-<!-- Interactive Top Weekly Date Strip -->
-<section class="px-margin-mobile pt-space-xs pb-space-sm">
+  <section id="liveCalendarSection" class="px-margin-mobile pt-space-md pb-space-sm flex flex-col gap-space-md">
+  <div class="rounded-2xl bg-surface-container-low p-space-md shadow-md">
+  <div class="flex items-start justify-between gap-space-sm">
+  <div>
+  <h1 class="font-headline-md text-headline-md text-on-surface">Calendar</h1>
+  <p id="liveCalendarDate" class="font-body-sm text-body-sm text-on-surface-variant mt-1"></p>
+  </div>
+  <div class="text-right">
+  <time id="liveClock" class="font-headline-sm text-headline-sm text-secondary"></time>
+  <p id="calendarTimeZone" class="font-label-sm text-label-sm text-on-surface-variant"></p>
+  </div>
+  </div>
+  <div class="flex items-center justify-between gap-space-xs mt-space-md">
+  <button id="calendarPrevMonth" class="min-w-11 min-h-11 rounded-xl bg-surface-container-high text-on-surface" type="button" aria-label="Previous month"><span class="material-symbols-outlined">chevron_left</span></button>
+  <h2 id="calendarMonthLabel" class="font-headline-sm text-headline-sm text-on-surface text-center"></h2>
+  <button id="calendarNextMonth" class="min-w-11 min-h-11 rounded-xl bg-surface-container-high text-on-surface" type="button" aria-label="Next month"><span class="material-symbols-outlined">chevron_right</span></button>
+  </div>
+  <div class="flex items-center justify-between mt-space-sm">
+  <button id="calendarTodayBtn" class="min-h-10 px-4 rounded-full bg-surface-container-high text-primary font-label-md text-label-md" type="button">Today</button>
+  <label class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2">Go to date
+  <input id="calendarDatePicker" class="min-h-10 max-w-36 rounded-lg bg-surface-container-high px-2 text-on-surface" type="date">
+  </label>
+  </div>
+  <div class="grid grid-cols-7 gap-1 mt-space-md text-center text-on-surface-variant font-label-sm text-label-sm" aria-hidden="true">
+  <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+  </div>
+  <div id="calendarGrid" class="grid grid-cols-7 gap-1 mt-space-xs" role="grid" aria-label="Calendar dates"></div>
+  <div class="flex flex-wrap gap-space-sm mt-space-md">
+  <button id="calendarAddEventBtn" class="min-h-11 flex-1 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="button">Add event</button>
+  <button id="calendarSyncGoogleBtn" class="min-h-11 flex-1 rounded-full bg-surface-container-high text-on-surface font-label-md text-label-md" type="button">Sync Google Calendar</button>
+  </div>
+  <p id="calendarConnectionStatus" class="mt-space-sm font-body-sm text-body-sm text-on-surface-variant" role="status">Events you add are saved on this device. Google Calendar sync is read-only.</p>
+  </div>
+  <div class="rounded-2xl bg-surface-container p-space-md">
+  <h2 id="selectedCalendarDay" class="font-headline-sm text-headline-sm text-on-surface"></h2>
+  <div id="calendarEvents" class="mt-space-sm flex flex-col gap-space-sm"></div>
+  </div>
+  </section>
+  <!-- Interactive Top Weekly Date Strip -->
+  <section class="hidden px-margin-mobile pt-space-xs pb-space-sm">
 <div class="flex items-center justify-between mb-space-xs">
 <div class="flex items-center gap-space-xs">
 <span class="font-headline-sm text-headline-sm text-on-surface">September 2024</span>
@@ -51,7 +89,7 @@
 </div>
 </section>
 <!-- Daily Readiness Banner (Playful Hero Card) -->
-<section class="px-margin-mobile my-space-xs">
+<section class="hidden px-margin-mobile my-space-xs">
 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-container/80 via-primary-container to-primary p-space-md text-on-primary shadow-[0_12px_28px_rgba(128,131,255,0.25)]">
 <div class="relative z-10 flex items-center justify-between">
 <div class="flex flex-col gap-1 max-w-[70%]">
@@ -69,7 +107,7 @@
 </div>
 </section>
 <!-- Agenda Feed -->
-<section class="px-margin-mobile flex flex-col gap-space-md mt-space-sm">
+<section class="hidden px-margin-mobile flex flex-col gap-space-md mt-space-sm">
 <!-- COURSE 1 -->
 <article class="flex flex-col rounded-2xl bg-surface-container p-4 shadow-md transition-all hover:bg-surface-container-high/90">
 <!-- Course Header -->
@@ -362,4 +400,30 @@
   })();
 </script></main><div class="fixed bottom-0 w-full z-50 pointer-events-none pb-safe"><div class="px-margin-mobile pb-space-sm flex justify-center"><nav class="pointer-events-auto w-full max-w-md bg-surface-container-low/90 backdrop-blur-xl rounded-full shadow-[0_12px_32px_rgba(0,0,0,0.55)] px-space-xs py-space-xs flex items-center justify-between" data-active-classes="text-primary font-label-md"><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-sm text-label-sm mt-0.5">Dashboard</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="checklist" href="#"><span class="material-symbols-outlined text-[20px]">checklist</span><span class="font-label-sm text-label-sm mt-0.5">Checklist</span></a><div class="flex items-center justify-center px-space-xs"><a aria-label="Quick Add Item" class="w-11 h-11 rounded-full bg-on-surface text-surface flex items-center justify-center shadow-[0_4px_16px_rgba(255,255,255,0.2)] active:scale-95 transition-transform" data-path="add-gear-item" href="#"><span class="material-symbols-outlined text-[22px]">add</span></a></div><a aria-current="page" class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 transition-colors text-primary font-label-md" data-path="schedule" href="#"><span class="material-symbols-outlined text-[20px]">calendar_today</span><span class="font-label-sm text-label-sm mt-0.5">Schedule</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] min-w-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="gear-radar" href="#"><span class="material-symbols-outlined text-[20px]">explore</span><span class="font-label-sm text-label-sm mt-0.5">Item Finder</span></a></nav></div></div>
 
-<script src="./app.js" defer></script></body></html>
+<dialog id="calendarEventDialog" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-outline-variant bg-surface-container p-space-md text-on-surface shadow-2xl backdrop:bg-surface-container-lowest/80">
+<form id="calendarEventForm" class="flex flex-col gap-space-sm">
+<h2 class="font-headline-md text-headline-md">Add event</h2>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Event name
+<input id="eventTitleInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="100" required>
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Date
+<input id="eventDateInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" type="date" required>
+</label>
+<div class="grid grid-cols-2 gap-space-sm">
+<label class="flex flex-col gap-1 font-label-md text-label-md">Start
+<input id="eventStartInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" type="time" required>
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">End
+<input id="eventEndInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" type="time" required>
+</label>
+</div>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Location (optional)
+<input id="eventLocationInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="100">
+</label>
+<div class="flex gap-space-sm pt-space-xs">
+<button class="flex-1 min-h-11 rounded-full bg-surface-container-high font-label-md text-label-md" type="button" data-close-event>Cancel</button>
+<button class="flex-1 min-h-11 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="submit">Save event</button>
+</div>
+</form>
+</dialog>
+<script src="./firebase-config.js" defer></script><script src="./app.js" defer></script></body></html>

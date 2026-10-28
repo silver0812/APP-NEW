@@ -31,8 +31,8 @@ jobs:
       - name: Assemble website
         run: |
           mkdir -p _site/icons
-          cp index.html checklist.html schedule.html item-finder.html gear-radar.html profile.html app.js tailwindcss.js manifest.webmanifest sw.js _site/
-          cp icons/packday.svg _site/icons/
+          cp index.html checklist.html schedule.html item-finder.html gear-radar.html profile.html app.js firebase-auth.js firebase-config.js tailwindcss.js manifest.webmanifest sw.js _site/
+          cp icons/packday.svg icons/profile-placeholder.svg _site/icons/
           touch _site/.nojekyll
 
       - name: Upload website artifact

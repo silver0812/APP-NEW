@@ -140,8 +140,8 @@
 <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-tertiary rounded-full shadow-[0_0_8px_#ffb690]"></span>
 </button>
 <a aria-label="Student Profile &amp; Settings" class="flex items-center gap-space-xs p-1 pr-2.5 rounded-xl bg-surface-container/70 border border-outline-variant/30 hover:border-primary/50 transition-all active:scale-95 group" data-path="profile-settings" href="#">
-<img alt="Student Avatar" class="w-8 h-8 rounded-lg object-cover ring-1 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3m6ywP3i6GXUeCtalbaW5kNWO8gsy_P0PGOMtFx7sjjZJOoVpJOjufeUPuqhoGa8hDkwpaRqLf535RS6lcTKhKPgX7juSA5nC8v2FTmoFSMwV45Ry00DqSY0vZUDGHcJECeHXsfxv11K5nZ0vFkwLPCsvZnv0yk6Bhfui7-8OANKx-YTtTue7TML9ZzgZIvFBn3VhWHofhnoRenaZNnqyqGdzZtSzDAj3S1g0XK4">
-<span class="hidden xs:inline-block font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors max-w-[70px] truncate">Alex K.</span>
+<img alt="Profile photo" class="w-8 h-8 rounded-lg object-cover ring-1 ring-primary/40" data-profile-avatar src="./icons/profile-placeholder.svg">
+<span class="hidden xs:inline-block font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors max-w-[70px] truncate" data-profile-short-name>Profile</span>
 </a>
 </div>
 </div>
@@ -158,10 +158,10 @@
 </div>
 <div class="text-center">
 <h3 class="font-headline-sm text-headline-sm text-on-surface">Campus NFC &amp; QR Pass</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Asia Pacific College • ID 2023-0182</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">No campus ID is connected</p>
 </div>
 <!-- Procedural Digital QR SVG Graphic -->
-<div class="p-3 bg-surface-container-lowest rounded-xl shadow-inner flex items-center justify-center">
+<div hidden class="p-3 bg-surface-container-lowest rounded-xl shadow-inner flex items-center justify-center">
 <svg class="w-44 h-44 text-primary" fill="currentColor" viewBox="0 0 100 100">
 <path d="M10,10 h30 v30 h-30 z M15,15 v20 h20 v-20 z M20,20 h10 v10 h-10 z"></path>
 <path d="M60,10 h30 v30 h-30 z M65,15 v20 h20 v-20 z M70,20 h10 v10 h-10 z"></path>
@@ -179,8 +179,8 @@
 </svg>
 </div>
 <div class="w-full flex items-center justify-between px-space-sm py-2 rounded-lg bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
-<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>Turnstile Sensor Ready</span>
-<span class="text-secondary font-headline-sm text-[11px]">ACTIVE</span>
+<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-outline"></span>Campus pass unavailable</span>
+<span class="text-secondary font-headline-sm text-[11px]">NOT CONNECTED</span>
 </div>
 </div>
 </div>
@@ -192,41 +192,41 @@
 <div class="relative flex items-start gap-space-md">
 <!-- Avatar with Dynamic Orbit Badge -->
 <div class="relative shrink-0">
-<img class="w-20 h-20 rounded-2xl object-cover shadow-lg shadow-surface-container-lowest" data-alt="High-detail futuristic portrait of Alex Cruz, a male collegiate student in dark hoodie with neon indigo ambient rim lighting, cinematic focus and modern tech backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDl9oBK5Q39lav6U2yUV5GF-0CBq3asTuaPxTTAxulxnUIVb1JwvTdbmna9MmUhmU6KaxW1u00BWHSeuVTtticTrN2eQKWXRUqdJu8KQfgx78rR_fTuwWrQfQIJ3SsG2LRoKGgpe_TvcJtHS_JviqYCukr1DlrfF1KtXhHAwNwjh4Wl62tmsGhIUkK2gA0jLzx_cZ66kq9RnskplhtjWDxIrNHjwKxB7YM9WHjP84">
-<span class="absolute -bottom-1.5 -right-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-secondary text-on-secondary shadow-md" title="Verified Campus Student">
+<img alt="Profile photo" class="w-20 h-20 rounded-2xl object-cover shadow-lg shadow-surface-container-lowest" data-profile-avatar src="./icons/profile-placeholder.svg">
+<span hidden class="absolute -bottom-1.5 -right-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-secondary text-on-secondary shadow-md" title="Verified Campus Student">
 <span class="material-symbols-outlined text-[16px] font-bold">verified</span>
 </span>
 </div>
 <div class="flex flex-col min-w-0 flex-1">
 <div class="flex items-center gap-space-xs flex-wrap">
-<h1 class="font-headline-md text-headline-md text-on-surface truncate">Alex Cruz</h1>
-<span class="px-2 py-0.5 rounded-full bg-primary-container/20 text-primary font-label-sm text-label-sm tracking-wide">SENIOR</span>
+<h1 class="font-headline-md text-headline-md text-on-surface truncate" data-profile-name>Your name</h1>
+<span class="px-2 py-0.5 rounded-full bg-primary-container/20 text-primary font-label-sm text-label-sm tracking-wide" data-profile-status>Local profile</span>
 </div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">CS &amp; Engineering • Robotics Lab</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate" data-profile-email>Saved on this device</p>
 <div class="flex items-center gap-1.5 mt-1 text-on-surface-variant font-label-sm text-label-sm">
-<span class="material-symbols-outlined text-[14px] text-outline">badge</span>
-<span class="">APC ID: <strong class="text-on-surface font-semibold">2023-0182</strong></span>
+<span class="material-symbols-outlined text-[14px] text-outline">info</span>
+<span data-profile-account-note>No account connected</span>
 </div>
 </div>
 </div>
 <!-- Student Readiness Stats Horizon -->
 <div class="grid grid-cols-3 gap-space-xs">
 <div class="flex flex-col items-center justify-center p-space-sm rounded-lg bg-surface-container text-center">
-<span class="font-headline-sm text-headline-sm text-tertiary flex items-center gap-0.5">14<span class="text-[13px]">🔥</span></span>
+<span class="font-headline-sm text-headline-sm text-tertiary flex items-center gap-0.5">0</span>
 <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Day Streak</span>
 </div>
 <div class="flex flex-col items-center justify-center p-space-sm rounded-lg bg-surface-container text-center">
-<span class="font-headline-sm text-headline-sm text-secondary">98%</span>
+<span class="font-headline-sm text-headline-sm text-secondary">0%</span>
 <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Prep Score</span>
 </div>
 <div class="flex flex-col items-center justify-center p-space-sm rounded-lg bg-surface-container text-center">
-<span class="font-headline-sm text-headline-sm text-primary">3</span>
+<span class="font-headline-sm text-headline-sm text-primary">0</span>
 <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Classes Today</span>
 </div>
 </div>
 <!-- Quick Action Profile Buttons -->
 <div class="flex items-center gap-space-sm pt-0.5">
-<button class="flex-1 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+<button id="editProfileBtn" class="flex-1 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:scale-95 transition-all" type="button">
 <span class="material-symbols-outlined text-[18px] text-primary">edit</span>
 <span class="">Edit Profile</span>
 </button>
@@ -240,8 +240,8 @@
 <section class="flex flex-col gap-space-sm">
 <div class="flex items-center justify-between px-space-xs">
 <span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Campus &amp; Term Sync</span>
-<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>Live Connected
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>Not connected
       </span>
 </div>
 <div class="rounded-xl bg-surface-container p-space-md flex flex-col gap-space-md shadow-sm">
@@ -252,8 +252,8 @@
 <span class="material-symbols-outlined text-[22px]">account_balance</span>
 </div>
 <div class="flex flex-col min-w-0">
-<span class="font-label-lg text-label-lg text-on-surface truncate">Asia Pacific College (APC)</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant truncate">APC-Secure • Auto-sync on Wi-Fi</span>
+<span class="font-label-lg text-label-lg text-on-surface truncate">Add your school</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Campus network is not connected</span>
 </div>
 </div>
 <!-- Luminous Toggle Switch -->
@@ -490,24 +490,42 @@
 <span class="material-symbols-outlined text-[20px]">security</span>
 </div>
 <div class="flex flex-col"><span class="font-label-lg text-label-lg text-on-surface">Privacy &amp; Campus Data Security</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">End-to-end schedule encryption</span></div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Custom profile and events are saved on this device.</span></div>
 </div>
 <span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
 </a>
 </div>
 <!-- Account Actions Grid -->
 <div class="flex flex-col gap-space-xs pt-space-xs">
-<button class="w-full h-12 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-2 active:scale-98 transition-all">
+<button id="googleSignInBtn" class="w-full h-12 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-2 active:scale-98 transition-all" type="button">
 <span class="material-symbols-outlined text-[18px] text-primary">switch_account</span>
-<span class="">Switch Student Account</span>
+<span data-google-sign-in-label>Sign up or sign in with Google</span>
 </button>
-<button class="w-full h-12 rounded-xl bg-surface-container-low hover:bg-error-container/20 text-error font-label-md text-label-md flex items-center justify-center gap-2 active:scale-98 transition-all">
+<button id="signOutBtn" class="w-full h-12 rounded-xl bg-surface-container-low hover:bg-error-container/20 text-error font-label-md text-label-md flex items-center justify-center gap-2 active:scale-98 transition-all" type="button">
 <span class="material-symbols-outlined text-[18px]">logout</span>
-<span class="">Sign Out of PackDay</span>
+<span class="">Sign out of Google</span>
 </button>
+<p data-google-setup-hint class="font-body-sm text-body-sm text-on-surface-variant px-space-xs" hidden>Google sign-in needs a Firebase project. <a class="text-primary underline" href="https://github.com/silver0812/APP-NEW#google-sign-in-and-calendar-setup">View setup steps</a>.</p>
 </div>
 </section>
 </div></main>
+<dialog id="profileEditDialog" class="w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-outline-variant bg-surface-container p-space-md text-on-surface shadow-2xl backdrop:bg-surface-container-lowest/80">
+<form id="profileEditForm" class="flex flex-col gap-space-md">
+<h2 class="font-headline-md text-headline-md">Edit profile</h2>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Name
+<input id="profileNameInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low px-3 text-on-surface" maxlength="60" autocomplete="name" required>
+</label>
+<label class="flex flex-col gap-1 font-label-md text-label-md">Profile photo
+<input id="profilePhotoInput" class="min-h-11 rounded-xl border border-outline-variant bg-surface-container-low p-2 text-on-surface" type="file" accept="image/*">
+</label>
+<img id="profileEditPreview" class="w-16 h-16 rounded-xl object-cover" alt="Profile photo preview" src="./icons/profile-placeholder.svg">
+<button id="removeProfilePhotoBtn" class="self-start text-primary font-label-md text-label-md" type="button">Remove photo</button>
+<div class="flex gap-space-sm">
+<button class="flex-1 min-h-11 rounded-full bg-surface-container-high font-label-md text-label-md" type="button" data-close-profile>Cancel</button>
+<button class="flex-1 min-h-11 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="submit">Save changes</button>
+</div>
+</form>
+</dialog>
 <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.6)]" data-active-classes="text-secondary font-label-md">
 <div class="h-20 px-space-xs flex items-center justify-between">
 <div class="flex flex-1 justify-around items-center">
@@ -539,4 +557,4 @@
 </nav>
 
 
-<script src="./app.js" defer></script></body></html>
+<script src="./firebase-config.js" defer></script><script src="./app.js" defer></script></body></html>

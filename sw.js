@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'packday-shell-v3';
+const CACHE_NAME = 'packday-shell-v4';
 const APP_FILES = [
   './',
   './index.html',
@@ -10,9 +10,12 @@ const APP_FILES = [
   './gear-radar.html',
   './profile.html',
   './app.js',
+  './firebase-auth.js',
+  './firebase-config.js',
   './tailwindcss.js',
   './manifest.webmanifest',
-  './icons/packday.svg'
+  './icons/packday.svg',
+  './icons/profile-placeholder.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -39,6 +42,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) {
+    if (request.headers.has('authorization')) return;
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         try {
