@@ -35,6 +35,8 @@ function errorMessage(error) {
       return 'Email or password is incorrect. Check your details or create an account.';
     case 'auth/operation-not-allowed':
       return 'Email and password sign-in is not enabled. The app owner must enable it in Firebase Authentication settings.';
+    case 'auth/configuration-not-found':
+      return 'Firebase Authentication is not set up for project web-app-2c8c4 yet. In Firebase Console, open Authentication and choose Get started, then enable Email/Password under Sign-in method.';
     case 'auth/unauthorized-domain':
       return 'This site is not authorized in Firebase. Add silver0812.github.io to Authentication → Settings → Authorized domains.';
     case 'auth/too-many-requests':
