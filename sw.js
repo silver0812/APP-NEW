@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'packday-shell-v9';
+const CACHE_NAME = 'packday-shell-v10';
 const APP_FILES = [
   './',
   './index.html',
@@ -9,7 +9,9 @@ const APP_FILES = [
   './item-finder.html',
   './gear-radar.html',
   './profile.html',
+  './login.html',
   './app.js',
+  './login.js',
   './firebase-auth.js',
   './firebase-config.js',
   './tailwindcss.js',

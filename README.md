@@ -16,14 +16,14 @@ Open **Profile → Night-Before Pack Prep**, choose a daily time, and enable the
 
 The website checks the reminder while PackDay is open. Browsers and mobile operating systems may pause web pages in the background, and a web-only app cannot guarantee an alarm after it has been fully closed. For dependable alarms while closed, a native Android/iOS alarm implementation or a configured push-notification service is required. On iPhone/iPad, notification support also depends on the installed home-screen app and iOS version.
 
-## Google sign-in and calendar setup
+## Account login and Google Calendar setup
 
-Google sign-in and calendar sync use the Firebase project configured in `firebase-config.js`. The Firebase Web app's public client configuration is included for the website.
+PackDay requires an authenticated account before opening the app. The login page supports email/password account creation and sign-in, password reset, and Google sign-in. Firebase email/password sign-in must be enabled in the Firebase Console for project `web-app-2c8c4`; Google sign-in is optional.
 
-1. In the [Firebase Console](https://console.firebase.google.com/) for project `web-app-2c8c4`, go to **Authentication → Sign-in method** and enable **Google**.
+1. In the [Firebase Console](https://console.firebase.google.com/) for project `web-app-2c8c4`, go to **Authentication → Sign-in method** and enable **Email/Password** (and **Google** if you want Google sign-in).
 2. Add `silver0812.github.io` and `localhost` under **Authentication → Settings → Authorized domains**.
-3. In the linked Google Cloud project, enable the **Google Calendar API**. If the OAuth consent screen is in testing, add the Google account you will use as a test user.
-4. Deploy the site and sign in with Google. Approve the requested read-only Calendar permission when syncing.
+3. If using Google Calendar sync, enable the **Google Calendar API** in the linked Google Cloud project. If the OAuth consent screen is in testing, add the Google account you will use as a test user.
+4. Deploy the site and create an account or sign in at the login screen.
 
 The config contains public web-app settings, not service-account credentials. Never put a Firebase service-account key or private OAuth client secret in this website.
 

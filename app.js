@@ -808,6 +808,18 @@
     }
   }
 
+  function enforceSignedInRoute(configured, user) {
+    if (location.pathname.endsWith('/login.html')) return;
+    if (configured && user) {
+      document.documentElement.classList.remove('auth-pending');
+      return;
+    }
+
+    const loginUrl = new URL('./login.html', location.href);
+    loginUrl.searchParams.set('next', `${location.pathname}${location.search}${location.hash}`);
+    location.replace(loginUrl.href);
+  }
+
   function renderProfile() {
     const name = profile.name.trim();
     const nameLabel = name || 'Your name';
@@ -993,6 +1005,7 @@
       authConfigAvailable = authConfigured;
       if (authConfigured) authInitializationFailed = false;
       googleUser = event.detail?.user || null;
+      enforceSignedInRoute(authConfigured, googleUser);
       if (googleUser) {
         if (profile.accountUid !== googleUser.uid) {
           profile = {
@@ -1035,6 +1048,9 @@
         authInitializationFailed = true;
         renderProfile();
         showNotice('Google sign-in could not start. Check the Firebase configuration and internet connection.');
+        window.dispatchEvent(new CustomEvent('packday-auth-state', {
+          detail: { configured: false, user: null }
+        }));
         return false;
       });
   }

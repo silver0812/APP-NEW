@@ -15,7 +15,10 @@ export async function initializePackDayAuth(config) {
   const [{ initializeApp, getApps, getApp }, {
     getAuth,
     GoogleAuthProvider,
+    createUserWithEmailAndPassword,
     onAuthStateChanged,
+    sendPasswordResetEmail,
+    signInWithEmailAndPassword,
     signInWithPopup,
     signOut
   }] = await Promise.all([
@@ -29,6 +32,9 @@ export async function initializePackDayAuth(config) {
 
   window.packdayAuth = {
     signIn: () => signInWithPopup(auth, googleProvider),
+    signInWithEmail: (email, password) => signInWithEmailAndPassword(auth, email, password),
+    createAccount: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+    sendPasswordReset: (email) => sendPasswordResetEmail(auth, email),
     signOut: () => signOut(auth),
     getCalendarAccessToken: async () => {
       if (!auth.currentUser) throw new Error('Sign in with Google before syncing your calendar.');
