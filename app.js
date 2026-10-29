@@ -781,6 +781,9 @@
   let profile = loadProfile();
   let googleUser = null;
   let authConfigured = false;
+  let authConfigAvailable = false;
+  let authInitializationFailed = false;
+  let authReady = Promise.resolve(false);
 
   function renderProfile() {
     const name = profile.name.trim();
@@ -794,19 +797,25 @@
     });
 
     const status = document.querySelector('[data-profile-status]');
-    if (status) status.textContent = googleUser ? 'Google account' : authConfigured ? 'Not signed in' : 'Local profile';
+    if (status) status.textContent = googleUser
+      ? 'Google account'
+      : authConfigured ? 'Not signed in' : authConfigAvailable ? 'Connecting to Google' : 'Local profile';
     const email = document.querySelector('[data-profile-email]');
     if (email) email.textContent = googleUser?.email || 'Saved on this device';
     const accountNote = document.querySelector('[data-profile-account-note]');
     if (accountNote) {
       accountNote.textContent = googleUser
         ? 'Google account connected'
-        : authConfigured ? 'Sign in to connect your account' : 'Google sign-in setup is required';
+        : authConfigured
+          ? 'Sign in to connect your account'
+          : authConfigAvailable
+            ? authInitializationFailed ? 'Google sign-in could not connect' : 'Connecting to Firebase…'
+            : 'Google sign-in setup is required';
     }
 
     const signInButton = document.getElementById('googleSignInBtn');
     const setupHint = document.querySelector('[data-google-setup-hint]');
-    if (setupHint) setupHint.hidden = authConfigured;
+    if (setupHint) setupHint.hidden = authConfigAvailable;
     const signInLabel = document.querySelector('[data-google-sign-in-label]');
     if (signInLabel) signInLabel.textContent = googleUser ? 'Switch Google account' : 'Sign up or sign in with Google';
     if (signInButton) signInButton.disabled = false;
@@ -922,15 +931,24 @@
     }
 
     document.getElementById('googleSignInBtn')?.addEventListener('click', async () => {
-      if (!authConfigured || !window.packdayAuth) {
+      if (!authConfigAvailable) {
         showNotice('Google sign-in needs Firebase setup before it can be used.');
         return;
       }
+      const signInButton = document.getElementById('googleSignInBtn');
+      if (signInButton) signInButton.disabled = true;
       try {
+        const initialized = await authReady;
+        if (!initialized || !window.packdayAuth) {
+          showNotice('Google sign-in could not start. Check your connection and Firebase setup.');
+          return;
+        }
         await window.packdayAuth.signIn();
       } catch (error) {
         console.error('PackDay Google sign-in failed.', error);
         showNotice(error.code === 'auth/popup-closed-by-user' ? 'Google sign-in was cancelled.' : 'Google sign-in failed. Check your connection and account settings.');
+      } finally {
+        if (signInButton) signInButton.disabled = false;
       }
     });
 
@@ -949,6 +967,8 @@
 
     window.addEventListener('packday-auth-state', (event) => {
       authConfigured = Boolean(event.detail?.configured);
+      authConfigAvailable = authConfigured;
+      if (authConfigured) authInitializationFailed = false;
       googleUser = event.detail?.user || null;
       if (googleUser) {
         if (profile.accountUid !== googleUser.uid) {
@@ -976,16 +996,23 @@
   function initializeAuth() {
     const config = window.PACKDAY_FIREBASE_CONFIG;
     if (!config || !config.apiKey || !config.authDomain || !config.projectId || !config.appId) {
+      authConfigAvailable = false;
       window.dispatchEvent(new CustomEvent('packday-auth-state', {
         detail: { configured: false, user: null }
       }));
       return;
     }
-    import('./firebase-auth.js')
+    authConfigAvailable = true;
+    renderProfile();
+    authReady = import('./firebase-auth.js')
       .then(({ initializePackDayAuth }) => initializePackDayAuth(config))
+      .then(() => Boolean(window.packdayAuth))
       .catch((error) => {
         console.error('PackDay could not initialize Google sign-in.', error);
+        authInitializationFailed = true;
+        renderProfile();
         showNotice('Google sign-in could not start. Check the Firebase configuration and internet connection.');
+        return false;
       });
   }
 
@@ -1335,14 +1362,19 @@
     });
     document.getElementById('calendarSyncGoogleBtn').addEventListener('click', async (event) => {
       const button = event.currentTarget;
-      if (!authConfigured || !window.packdayAuth) {
+      if (!authConfigAvailable) {
         showNotice('Google Calendar sync needs Firebase setup first.');
         if (connectionStatus) connectionStatus.textContent = 'Set up Google sign-in to connect your calendar. Events you add here are saved on this device.';
         return;
       }
       button.disabled = true;
-      if (connectionStatus) connectionStatus.textContent = 'Connect your Google account and approve read-only Calendar access.';
+      if (connectionStatus) connectionStatus.textContent = 'Connecting to Google sign-in...';
       try {
+        const initialized = await authReady;
+        if (!initialized || !window.packdayAuth) {
+          throw new Error('Google sign-in could not initialize. Check your connection and Firebase setup.');
+        }
+        if (connectionStatus) connectionStatus.textContent = 'Connect your Google account and approve read-only Calendar access.';
         const token = await window.packdayAuth.getCalendarAccessToken();
         const { start, end } = localMonthRange(displayedCalendarMonth);
         const params = new URLSearchParams({
