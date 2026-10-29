@@ -785,6 +785,29 @@
   let authInitializationFailed = false;
   let authReady = Promise.resolve(false);
 
+  function googleSignInErrorMessage(error) {
+    switch (error?.code) {
+      case 'auth/unauthorized-domain':
+        return 'This website is not authorized in Firebase. Add silver0812.github.io in Authentication → Settings → Authorized domains.';
+      case 'auth/operation-not-allowed':
+        return 'Google sign-in is disabled. Enable Google under Firebase Authentication → Sign-in method.';
+      case 'auth/popup-blocked':
+        return 'Your browser blocked the Google sign-in popup. Allow popups for this site and try again.';
+      case 'auth/popup-closed-by-user':
+        return 'Google sign-in was cancelled.';
+      case 'auth/cancelled-popup-request':
+        return 'A Google sign-in window is already open. Finish that sign-in or close it before trying again.';
+      case 'auth/network-request-failed':
+        return 'Google sign-in could not reach Firebase. Check your internet connection and try again.';
+      case 'auth/account-exists-with-different-credential':
+        return 'This email is already registered with a different sign-in method. Use the method previously linked to this account.';
+      default:
+        return error?.code
+          ? `Google sign-in failed (${error.code}). Check Firebase Authentication settings and try again.`
+          : 'Google sign-in failed. Check your connection and Firebase Authentication settings.';
+    }
+  }
+
   function renderProfile() {
     const name = profile.name.trim();
     const nameLabel = name || 'Your name';
@@ -946,7 +969,7 @@
         await window.packdayAuth.signIn();
       } catch (error) {
         console.error('PackDay Google sign-in failed.', error);
-        showNotice(error.code === 'auth/popup-closed-by-user' ? 'Google sign-in was cancelled.' : 'Google sign-in failed. Check your connection and account settings.');
+        showNotice(googleSignInErrorMessage(error));
       } finally {
         if (signInButton) signInButton.disabled = false;
       }
